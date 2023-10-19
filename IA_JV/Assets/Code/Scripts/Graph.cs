@@ -55,18 +55,21 @@ public class Graph
         return null;
     }
 
-    int minDistance(int[] dist, bool[] sptSet)
+    public int Trouve_min2(int[] Q, float[] dist)
     {
-        int min = int.MaxValue, min_index = -1;
+        float mini = Mathf.Infinity;
+        int sommet = -1;
 
-        for (int v = 0; v < nodes.Count; v++)
-            if (sptSet[v] == false && dist[v] <= min)
+        foreach (int s in Q)
+        {
+            if(dist[s] < mini)
             {
-                min = dist[v];
-                min_index = v;
+                mini = dist[s];
+                sommet = s;
             }
+        }
 
-        return min_index;
+        return sommet;
     }
 
     public Node Trouve_min(Node[] Q, float[] dist)
@@ -99,43 +102,67 @@ public class Graph
 
     }
 
+
+
+
     public List<Node> GetPath2(Node from, Node to)
     {
-        int[] dist = new int[nodes.Count];
-        bool[] sptSet = new bool[nodes.Count];
+        if (!nodes.Contains(from) || !nodes.Contains(to))
+            return null;
 
+        List<int> Q = new List<int>();
+        float[] dist = new float[nodes.Count];
+        int[] prev = new int[nodes.Count];
         for (int i = 0; i < nodes.Count; i++)
         {
-            dist[i] = int.MaxValue;
-            sptSet[i] = false;
+            dist[i] = Mathf.Infinity;
+            prev[i] = -1;
+            Q.Add(i);
         }
 
         dist[nodes.IndexOf(from)] = 0;
 
-        for (int count = 0; count < nodes.Count - 1; count++)
+        while (Q.Count > 0)
         {
-            int u = minDistance(dist, sptSet);
-            sptSet[u] = true;
-            for (int v = 0; v < nodes.Count; v++)
+            int u = Trouve_min2(Q.ToArray(), dist);
+            if(u == -1)
             {
-                int l = nodes[u].GetLengthTo(nodes[v]);
+                break;
+            }
+            Q.Remove(u);
+            foreach (Node v in nodes[u].GetNeighboors())
+            {
+                int v2 = nodes.IndexOf(GetNodeByName(v.Name));
+                if (Q.Contains(v2))
+                {
+                    float alt = dist[u] + nodes[v2].GetLengthTo(nodes[u]);
+                    if(alt < dist[v2])
+                    {
+                        dist[v2] = alt;
+                        prev[v2] = u;
+                    }
+                }
 
-                if (!sptSet[v] && l != 0 &&
-                     dist[u] != int.MaxValue && dist[u] + l < dist[v])
-                    dist[v] = dist[u] + l;
             }
         }
 
+
+        int sdeb = nodes.IndexOf(from);
+        int sfin = nodes.IndexOf(to);
+        int s = sfin;
         List<Node> suite = new List<Node>();
-        for (int i = 0; i < nodes.Count; i++)
+        while (s != sdeb && s != -1)
         {
-            Debug.Log(dist[i]);
-            suite.Add(nodes[i]);
+            suite.Add(nodes[s]);
+            s = prev[s];
         }
 
+        suite.Add(from);
+        suite.Reverse();
 
         return suite;
     }
+
 
     public List<Node> GetPath(Node from, Node to)
     {
@@ -160,7 +187,16 @@ public class Graph
             Q.Remove(u);
             foreach (Node v in u.GetNeighboors())
             {
-                maj_distances(u, v, dist, prev);
+                if(Q.Contains(v))
+                {
+
+                    maj_distances(u, v, dist, prev);
+
+
+
+
+                }
+               
             }
         }
 

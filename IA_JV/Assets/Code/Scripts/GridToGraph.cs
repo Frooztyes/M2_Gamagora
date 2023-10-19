@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,66 +11,31 @@ public class GridToGraph : MonoBehaviour
     Dictionary<Vector2, Transform> elements;
     List<Node> path;
 
-    // Start is called before the first frame update
-    void Start()
-    { 
-        elements = new Dictionary<Vector2, Transform>();
-        int children = Grid.childCount;
-        for (int i = 0; i < children; ++i)
-        {
-            if(!elements.ContainsKey((Vector2)Grid.GetChild(i).position))
-            {
-                elements.Add(
-                    (Vector2)Grid.GetChild(i).position,
-                    Grid.GetChild(i)
-                );
-                Grid.GetChild(i).name = $"{Grid.GetChild(i).position.x},{Grid.GetChild(i).position.y}";
-            } else
-            {
-                Destroy(Grid.GetChild(i).gameObject);
-            }
-        }
+    string PositionToName(Vector2 pos)
+    {
+        return $"{pos.x},{pos.y}";
+    }
 
+    Graph CreateGraph()
+    {
         Graph graph = new Graph();
 
         foreach (var t in elements)
         {
-            string name = $"{t.Key.x},{t.Key.y}";
-            Node node = graph.AddNode(name);
+            Node node = graph.AddNode(PositionToName(t.Key));
 
             List<Transform> neighboors = Voisins(new Vector2(t.Key.x, t.Key.y));
 
             foreach (Transform no in neighboors)
             {
-                name = $"{no.position.x},{no.position.y}";
-                node.AddNeighboor(new Node(name), 1);
+                node.AddNeighboor(new Node(PositionToName(no.position)), 1);
             }
         }
 
         Debug.Log(graph);
-
-        Transform start = GameObject.FindGameObjectWithTag("Start").transform;
-        if (start == null) return;
-        start.gameObject.GetComponent<SpriteRenderer>().color = Color.green;
-
-        Transform end = GameObject.FindGameObjectWithTag("End").transform;
-        if (end == null) return;
-        end.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-
-        string fromName = $"{start.position.x},{start.position.y}";
-        string toName = $"{end.position.x},{end.position.y}";;
-
-        path = graph.GetPath2(
-            graph.GetNodeByName(fromName),
-            graph.GetNodeByName(toName)
-        );
-
-        //foreach (Node node in path)
-        //{
-        //    Debug.Log(node.Name);
-        //}
-
+        return graph;
     }
+
 
     private void OnDrawGizmos()
     {
@@ -95,15 +61,72 @@ public class GridToGraph : MonoBehaviour
         if (start != null)
         {
             start.GetComponent<SpriteRenderer>().color = Color.green;
-        }
+        } 
 
         GameObject end = GameObject.FindGameObjectWithTag("End");
         if (end != null)
         {
             end.GetComponent<SpriteRenderer>().color = Color.red;
+        } 
+
+
+    }
+
+    [Range(0, 5)]
+    public float noise = 5f;
+
+    private Dictionary<Vector2, Transform> GetElements()
+    {
+        Dictionary<Vector2, Transform> elements = new Dictionary<Vector2, Transform>();
+        int children = Grid.childCount;
+        for (int i = 0; i < children; ++i)
+        {
+            if (!elements.ContainsKey(Grid.GetChild(i).position))
+            {
+                float sample = Mathf.PerlinNoise(
+                    Grid.GetChild(i).position.x*1f/ noise,
+                    Grid.GetChild(i).position.y*1f/ noise
+                );
+                Debug.Log(sample);
+                if(sample < 0.5)
+                {
+                    Grid.GetChild(i).gameObject.SetActive(false);
+                    continue;
+                }
+
+
+                Grid.GetChild(i).gameObject.SetActive(true);
+                elements.Add(
+                    Grid.GetChild(i).position,
+                    Grid.GetChild(i)
+                );
+                Grid.GetChild(i).name = PositionToName(Grid.GetChild(i).position);
+            }
         }
 
+        if (this.elements == elements) return this.elements;
+        return elements;
+    }
 
+
+    private void Update()
+    {
+        elements = GetElements();
+
+        Graph graph = CreateGraph();
+
+        Transform start = GameObject.FindGameObjectWithTag("Start").transform;
+        if (start == null) return;
+        start.gameObject.GetComponent<SpriteRenderer>().color = Color.green;
+
+        Transform end = GameObject.FindGameObjectWithTag("End").transform;
+        if (end == null) return;
+        end.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+
+        path = graph.GetPath2(
+            graph.GetNodeByName(PositionToName(start.position)),
+            graph.GetNodeByName(PositionToName(end.position))
+        );
     }
 
 
