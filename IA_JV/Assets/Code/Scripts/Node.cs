@@ -9,11 +9,21 @@ public class Node
 
     public Dictionary<Node, float> Neighboors { get; }
 
+    public State Status { get; set; }
+
+    public enum State
+    {
+        Present,
+        InDeletion,
+        Start,
+        End
+    }
 
     public Node(string name)
     {
         Neighboors = new Dictionary<Node, float>();
         Name = name;
+        Status = State.Present;
     }
 
     public void AddNeighboor(Node n, float cost)
@@ -59,7 +69,7 @@ public class Node
         string s = $"Node ({Name}) - Voisins ({Neighboors.Count}): \n";
         foreach (var node in Neighboors)
         {
-            s += "\t Node " + node.Key;
+            s += "\t Node " + node.Key.Name;
         }
         return s + "\n";
     }

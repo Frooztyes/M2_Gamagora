@@ -6,14 +6,17 @@ TagManager:
   tags:
   - End
   - Start
+  - Ennemy
+  - Node
+  - DeactivatedNode
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ladders
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 
