@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public class Graph
 {
-    public List<Node> Nodes { get; set; }
-
+    public Dictionary<Vector2, Node> Nodes { get; set; }
     public enum TypeLink
     {
         OneWay,
@@ -18,53 +15,51 @@ public class Graph
 
     public Graph()
     {
-        Nodes = new List<Node>();
+        Nodes = new Dictionary<Vector2, Node>();
     }
 
     public void RemoveNode(Node n)
     {
-        foreach(var neighbor in n.Neighboors.ToList())
+        foreach(var neighbor in n.Neighbors.ToList())
         {
-            neighbor.Key.Neighboors.Remove(n);
+            neighbor.Key.Neighbors.Remove(n);
         }
-        Nodes.Remove(n);
+        Nodes.Remove(n.Position);
     }
 
-    public void CreateLink(string _d1, string _d2, float length, TypeLink typeLink = TypeLink.TwoWay)
+    public void CreateLink(Vector2 _d1, Vector2 _d2, float length, TypeLink typeLink = TypeLink.TwoWay)
     {
-        Node d1 = GetNodeByName(_d1);
-        Node d2 = GetNodeByName(_d2);
+        Node d1 = GetNodeByPosition(_d1);
+        Node d2 = GetNodeByPosition(_d2);
         if (d1 == null || d2 == null) return;
 
-        d1.AddNeighboor(d2, length);
+        d1.AddNeighbor(d2, length);
         if (typeLink == TypeLink.TwoWay)
-            d2.AddNeighboor(d1, length);
+            d2.AddNeighbor(d1, length);
     }
 
     public void CreateLink(Node d1, Node d2, float length, TypeLink typeLink = TypeLink.TwoWay)
     {
-        d1.AddNeighboor(d2, length);
+        d1.AddNeighbor(d2, length);
         if(typeLink == TypeLink.TwoWay)
-            d2.AddNeighboor(d1, length);
+            d2.AddNeighbor(d1, length);
     }
 
     public void AddNode(Node d)
     {
-        Nodes.Add(d);
+        Nodes.Add(d.Position, d);
     }
-    public Node AddNode(string d)
+    public Node AddNode(Vector2 pos)
     {
-        Node n = new Node(d);
-        Nodes.Add(n);
+        Node n = new Node(pos);
+        Nodes.Add(pos, n);
         return n;
     }
 
-    public Node GetNodeByName(string name)
+    public Node GetNodeByPosition(Vector2 position)
     {
-        foreach (Node node in Nodes)
-        {
-            if (node.Name == name) return node;
-        }
+        if (Nodes.TryGetValue(position, out Node n))
+            return n;
         return null;
     }
 
@@ -102,10 +97,16 @@ public class Graph
         return sommet;
     }
 
+    public int GetIndex(Node n)
+    {
+        return Nodes.Values.ToList().IndexOf(n);
+    }
+
+
     private void maj_distances(Node _s1, Node _s2, float[] dist, Node[] prev)
     {
-        int s1 = Nodes.IndexOf(GetNodeByName(_s1.Name));
-        int s2 = Nodes.IndexOf(GetNodeByName(_s2.Name));
+        int s1 = GetIndex(_s1);
+        int s2 = GetIndex(_s2);
         
         if (dist[s2] > dist[s1] + _s1.GetLengthTo(_s2))
         {
@@ -120,7 +121,7 @@ public class Graph
 
     public List<Node> GetPath2(Node from, Node to)
     {
-        if (!Nodes.Contains(from) || !Nodes.Contains(to))
+        if (!Nodes.ContainsKey(from.Position) || !Nodes.ContainsKey(to.Position))
             return null;
 
         List<int> Q = new List<int>();
@@ -133,7 +134,7 @@ public class Graph
             Q.Add(i);
         }
 
-        dist[Nodes.IndexOf(from)] = 0;
+        dist[GetIndex(from)] = 0;
 
         while (Q.Count > 0)
         {
@@ -143,12 +144,12 @@ public class Graph
                 break;
             }
             Q.Remove(u);
-            foreach (Node v in Nodes[u].GetNeighboors())
+            foreach (Node v in Nodes.ElementAt(u).Value.GetNeighboors())
             {
-                int v2 = Nodes.IndexOf(GetNodeByName(v.Name));
+                int v2 = GetIndex(GetNodeByPosition(v.Position));
                 if (Q.Contains(v2))
                 {
-                    float alt = dist[u] + Nodes[v2].GetLengthTo(Nodes[u]);
+                    float alt = dist[u] + Nodes.ElementAt(v2).Value.GetLengthTo(Nodes.ElementAt(u).Value);
                     if(alt < dist[v2])
                     {
                         dist[v2] = alt;
@@ -160,13 +161,13 @@ public class Graph
         }
 
 
-        int sdeb = Nodes.IndexOf(from);
-        int sfin = Nodes.IndexOf(to);
+        int sdeb = GetIndex(from);
+        int sfin = GetIndex(to);
         int s = sfin;
         List<Node> suite = new List<Node>();
         while (s != sdeb && s != -1)
         {
-            suite.Add(Nodes[s]);
+            suite.Add(Nodes.ElementAt(s).Value);
             s = prev[s];
         }
 
@@ -179,7 +180,7 @@ public class Graph
 
     public List<Node> GetPath(Node from, Node to)
     {
-        if (!Nodes.Contains(from) || !Nodes.Contains(to))
+        if (!Nodes.ContainsValue(from) || !Nodes.ContainsValue(to))
             return null;
 
         List<Node> Q = new List<Node>();
@@ -189,10 +190,10 @@ public class Graph
         {
             dist[i] = Mathf.Infinity;
             prev[i] = null;
-            Q.Add(Nodes[i]);
+            Q.Add(Nodes.ElementAt(i).Value);
         }
 
-        dist[Nodes.IndexOf(from)] = 0;
+        dist[GetIndex(from)] = 0;
 
         while (Q.Count > 0)
         {
@@ -216,10 +217,10 @@ public class Graph
 
         Node s = to;
         List<Node> suite = new List<Node>();
-        while(s.Name != from.Name)
+        while(s.Position != from.Position)
         {
             suite.Add(s);
-            s = prev[Nodes.IndexOf(s)];
+            s = prev[GetIndex(s)];
         }
 
         suite.Add(from);
@@ -232,7 +233,7 @@ public class Graph
     {
         string s = "";
 
-        foreach (Node node in Nodes)
+        foreach (Node node in Nodes.Values)
         {
             s += node;
         }
@@ -241,8 +242,7 @@ public class Graph
 
     public Node GetNodeByVector(Vector2 pos)
     {
-        string name = $"{Mathf.Floor(pos.x)},{Mathf.Floor(pos.y)}";
-        return GetNodeByName(name);
+        return GetNodeByPosition(pos);
     }
 
     public void RecalculateLength(Node current, Node neigh1, Node neigh2)
@@ -254,7 +254,7 @@ public class Graph
         int lenghtTo1 = current.GetLengthTo(neigh1);
         int lenghtTo2 = current.GetLengthTo(neigh2);
 
-        neigh2.AddNeighboor(neigh1, lenghtTo1 + lenghtTo2);
-        neigh1.AddNeighboor(neigh2, lenghtTo1 + lenghtTo2);
+        neigh2.AddNeighbor(neigh1, lenghtTo1 + lenghtTo2);
+        neigh1.AddNeighbor(neigh2, lenghtTo1 + lenghtTo2);
     }
 }

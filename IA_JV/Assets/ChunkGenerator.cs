@@ -28,7 +28,7 @@ public class ChunkGenerator : MonoBehaviour
 
     Chunk chunk;
 
-    Dictionary<int, List<GameObject>> chunks;
+    Dictionary<int, ChunkInfo> chunks;
 
     Transform player;
     Vector3Int startPoint;
@@ -42,7 +42,7 @@ public class ChunkGenerator : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
         chunk = new Chunk(chunkTemplate);
-        chunks = new Dictionary<int, List<GameObject>>();
+        chunks = new Dictionary<int, ChunkInfo>();
 
         currentChunkId = GetPlayerChunk();
 
@@ -93,16 +93,14 @@ public class ChunkGenerator : MonoBehaviour
     }
 #endif
 
-    private void CreateGraphNode(Vector3 position)
+    private GameObject CreateGraphNode(Vector3 position)
     {
         GameObject g = Instantiate(graphNode, position + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
         g.transform.parent = grid2.transform;
-        if(chunks.TryGetValue(currentChunkId, out List<GameObject> nodes)) {
-            nodes.Add(g);
-        }
+        return g;
     }
 
-    private List<int> GenerateLadderInChunk()
+    private List<int> GenerateLadderInChunk(List<GameObject> nodes, Dictionary<Vector3Int, TileBase> tilesWall)
     {
         List<int> laddersPosition = new List<int>();
         int previousX = int.MaxValue;
@@ -123,9 +121,10 @@ public class ChunkGenerator : MonoBehaviour
                     ladderTile
                 );
                 tilemap.SetTile(position, null);
+                tilesWall.Remove(position);
                 background.SetTile(position, backgroundTile);
                 if (i > 0)
-                    CreateGraphNode(position);
+                    nodes.Add(CreateGraphNode(position));
             }
             ladders.SetTile(
                 startPoint + new Vector3Int(x, chunk.InnerTop + chunk.InnerHeight + 3, 0),
@@ -137,8 +136,9 @@ public class ChunkGenerator : MonoBehaviour
         return laddersPosition;
     }
 
-    private void GenerateLights(List<int> laddersPosition)
+    private List<GameObject> GenerateLights(List<int> laddersPosition, Dictionary<Vector3Int, TileBase> tilesBg)
     {
+        List<GameObject> lights = new List<GameObject>();
         int nbLights = Random.Range(3, 5);
         Vector2 previousPosition = new Vector2(float.MaxValue, float.MaxValue);
         for (int f = 0; f < nbLights; f++)
@@ -157,12 +157,19 @@ public class ChunkGenerator : MonoBehaviour
 
             Vector3Int position = startPoint + new Vector3Int(x, y, 0);
             background.SetTile(position, lightTile);
-            Instantiate(lightPrefab, position + 0.5f * Vector3.one, Quaternion.identity);
+            tilesBg.Remove(position);
+            tilesBg.Add(position, lightTile);
+            GameObject g = Instantiate(lightPrefab, position + 0.5f * Vector3.one, Quaternion.identity);
+            lights.Add(g);
         }
+        return lights;
     }
 
-    private void GenerateChunk()
+    private ChunkInfo GenerateChunk()
     {
+        Dictionary<Vector3Int, TileBase> tilesWall = new Dictionary<Vector3Int, TileBase>();
+        Dictionary<Vector3Int, TileBase> tilesBg = new Dictionary<Vector3Int, TileBase>();
+        List<GameObject> nodes = new List<GameObject>();
 
         for (int x = 0; x < chunk.Width; x++)
         {
@@ -172,12 +179,14 @@ public class ChunkGenerator : MonoBehaviour
                 if (tile != null)
                 {
                     tilemap.SetTile(startPoint + new Vector3Int(x, y, 0), tile);
+                    tilesWall.Add(startPoint + new Vector3Int(x, y, 0), tile);
                 } 
                 else
                 {
                     if(x >= chunk.InnerLeft && x <= chunk.InnerRight && y <= chunk.InnerBottom && y >= chunk.InnerTop)
                     {
                         background.SetTile(startPoint + new Vector3Int(x, y, 0), backgroundTile);
+                        tilesBg.Add(startPoint + new Vector3Int(x, y, 0), backgroundTile);
                     }
                 }
             } 
@@ -186,44 +195,55 @@ public class ChunkGenerator : MonoBehaviour
         for (int i = 1; i <= chunk.InnerWidth + 1; i++)
         {
             Vector3Int position = startPoint + new Vector3Int(i + chunk.InnerWidth, chunk.InnerTop, 0);
-            CreateGraphNode(position);
+            nodes.Add(CreateGraphNode(position));
         }
 
-        List<int> ladderPosition = GenerateLadderInChunk();
+        List<int> ladderPosition = GenerateLadderInChunk(nodes, tilesWall);
 
-        GenerateLights(ladderPosition);
+        List<GameObject> lights = GenerateLights(ladderPosition, tilesBg);
+
+        ChunkInfo chunkInfo = new ChunkInfo(tilesWall, tilesBg, lights, nodes);
+
+        chunkInfo.DeactivateChunk(tilemap, background);
+
+        return chunkInfo;
 
     }
 
     void DeactivateChunks()
     {
-        foreach (List<GameObject> nodes in chunks.Values)
+        int borneInf = RenderDistance / 2;
+        int borneSup = RenderDistance % 2 == 0 ? RenderDistance / 2 : (RenderDistance / 2) + 1;
+
+        foreach (var chunk in chunks)
         {
-            foreach(GameObject node in nodes)
+            if(chunk.Key >= GetPlayerChunk() - borneInf || chunk.Key < GetPlayerChunk() + borneSup)
             {
-                if(!node.CompareTag("Start") || !node.CompareTag("End"))
-                    node.tag = "DeactivatedNode";
+                //if(!chunk.Value.IsActive)
+                //{
+                //    chunk.Value.DeactivateChunk(tilemap, background);
+                //}
+            } else
+            {
+                chunk.Value.DeactivateChunk(tilemap, background);
             }
         }
 
-        int borneInf = RenderDistance / 2;
-        int borneSup = RenderDistance % 2 == 0 ? RenderDistance / 2 : (RenderDistance / 2) + 1;
+
         for (int i = GetPlayerChunk() - borneInf; i < GetPlayerChunk() + borneSup; i++)
         {
-            if(chunks.TryGetValue(i, out List<GameObject> nodes))
+            if(chunks.TryGetValue(i, out ChunkInfo chunkInfo))
             {
-                foreach(GameObject node in nodes)
-                {
-                    if (!node.CompareTag("Start") || !node.CompareTag("End"))
-                        node.tag = "Node";
-                }
-            } else if(i >= 0)
+                chunkInfo.ActivateChunk(tilemap, background);
+            } 
+            else if(i >= 0)
             {
                 startPoint = Vector3Int.FloorToInt(transform.position - chunk.Left * Vector3.right - chunk.Top * Vector3.up);
                 startPoint.y -= (chunk.Top - chunk.Bottom) * i;
-                chunks.Add(i, new List<GameObject>());
                 currentChunkId = i;
-                GenerateChunk();
+                ChunkInfo c = GenerateChunk();
+                chunks.Add(i, c);
+                c.ActivateChunk(tilemap, background);
             }
         }
     }

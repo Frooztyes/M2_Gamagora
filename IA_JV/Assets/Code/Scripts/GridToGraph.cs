@@ -11,11 +11,6 @@ public class GridToGraph : MonoBehaviour
     Dictionary<Vector2, Transform> elements;
     List<List<Node>> paths;
 
-    string PositionToName(Vector2 pos)
-    {
-        return $"{Mathf.Floor(pos.x)},{Mathf.Floor(pos.y)}";
-    }
-
     Vector3 NameToPosition(string name)
     {
         string[] pos = name.Split(",");
@@ -31,33 +26,28 @@ public class GridToGraph : MonoBehaviour
 
         foreach (var t in elements)
         {
-            Node node = graph.AddNode(PositionToName(t.Key));
+            Node node = graph.AddNode(new Vector2(t.Key.x, t.Key.y));
             if (t.Value.CompareTag("Start")) node.Status = Node.State.Start;
             if (t.Value.CompareTag("End")) node.Status = Node.State.End;
             if (t.Value.CompareTag("DeactivatedNode")) continue;
-
-            List<Transform> neighboors = Voisins(new Vector2(t.Key.x, t.Key.y));
+            List<Transform> neighboors = Voisins(node.Position);
 
             foreach (Transform no in neighboors)
             {
-                node.AddNeighboor(new Node(PositionToName(no.position)), 1);
+                node.AddNeighbor(new Node((Vector2) no.position - Vector2.one * 0.5f), 1);
             }
         }
 
         List<Node> toRemove = new List<Node>();
-        foreach(Node node in graph.Nodes)
+        foreach(Node node in graph.Nodes.Values)
         {
-            string[] pos = node.Name.Split(",");
-            float x = Mathf.Floor(float.Parse(pos[0]));
-            float y = Mathf.Floor(float.Parse(pos[1]));
-
             Vector2 dir = Vector2.zero;
 
-            if(IsNotNecessary(new Vector2(x, y)) == 1)
+            if(IsNotNecessary(node.Position) == 1)
             {
                 dir = Vector2.up;
             }
-            if (IsNotNecessary(new Vector2(x, y)) == 2)
+            if (IsNotNecessary(node.Position) == 2)
             {
                 dir = Vector2.right;
             }
@@ -66,9 +56,9 @@ public class GridToGraph : MonoBehaviour
             if (node.Status == Node.State.Start) continue;
             if (node.Status == Node.State.End) continue;
 
-            Node neigh1 = GetClosestNodeNotInDeletion(graph, dir, new Vector2(x, y));
+            Node neigh1 = GetClosestNodeNotInDeletion(graph, dir, node.Position);
             if (neigh1 == null) continue;
-            Node neigh2 = GetClosestNodeNotInDeletion(graph, -dir, new Vector2(x, y));
+            Node neigh2 = GetClosestNodeNotInDeletion(graph, -dir, node.Position);
             if (neigh2 == null) continue;
 
             graph.RecalculateLength(node, neigh1, neigh2);
@@ -93,7 +83,7 @@ public class GridToGraph : MonoBehaviour
             found = graph.GetNodeByVector(position + direction * id);
             if (found != null && found.Status != Node.State.InDeletion)
                 return found;
-            if (id > 100) return null;
+            if (id > 10) return null;
             id++;
         }
     }
@@ -117,15 +107,14 @@ public class GridToGraph : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Vector3 offset = Vector3.one * 0.5f;
-        offset.z = 0;
+        Vector2 offset = Vector2.one * 0.5f;
         if(graph == null) return;
         Color defaultColor = Color.grey;
         float thickness = 3.0f;
         Handles.color = defaultColor;
-        foreach (Node node in graph.Nodes)
+        foreach (Node node in graph.Nodes.Values)
         {
-            if (!elements.TryGetValue(NameToPosition(node.Name), out Transform t)) continue;
+            if (!elements.TryGetValue(node.Position, out Transform t)) continue;
 
             if (t.CompareTag("Start"))
             {
@@ -142,39 +131,41 @@ public class GridToGraph : MonoBehaviour
 
             if (t.CompareTag("DeactivatedNode")) continue;
             Handles.DrawSolidDisc(
-                NameToPosition(node.Name) + offset, 
+                node.Position + offset, 
                 -Vector3.forward, 
                 0.2f
             );
 
-            foreach(var neighbor in node.Neighboors)
+            foreach(var neighbor in node.Neighbors)
             {
                 Handles.DrawLine(
-                    NameToPosition(node.Name) + offset, 
-                    NameToPosition(neighbor.Key.Name) + offset, 
+                    node.Position + offset, 
+                    neighbor.Key.Position + offset, 
                     thickness
                 );
             }
 
         }
+
+        if (paths == null) return;
         if (paths.Count == 0) return;
 
         foreach (List<Node> nodes in paths)
         {
-            foreach(Node node in nodes)
+            foreach (Node node in nodes)
             {
-                foreach (var neighbor in node.Neighboors)
+                foreach (var neighbor in node.Neighbors)
                 {
                     if (nodes.Contains(neighbor.Key)) Handles.color = Color.blue;
                     else Handles.color = defaultColor;
                     Handles.DrawLine(
-                        NameToPosition(node.Name) + offset,
-                        NameToPosition(neighbor.Key.Name) + offset,
+                        node.Position + offset,
+                        neighbor.Key.Position + offset,
                         thickness
                     );
                 }
             }
-        }       
+        }
 
     }
 #endif
@@ -194,7 +185,7 @@ public class GridToGraph : MonoBehaviour
                     pos,
                     Grid.GetChild(i)
                 );
-                Grid.GetChild(i).name = PositionToName(Grid.GetChild(i).position);
+                //Grid.GetChild(i).name = PositionToName(Grid.GetChild(i).position);
                 if(Grid.GetChild(i).CompareTag("Start") || Grid.GetChild(i).CompareTag("End"))
                 {
                     Grid.GetChild(i).tag = "Node";
@@ -245,6 +236,7 @@ public class GridToGraph : MonoBehaviour
         else dir.y = 0;
         return dir;
     }
+
 
     GameObject start;
     GameObject[] end;
@@ -298,19 +290,7 @@ public class GridToGraph : MonoBehaviour
         {
             EnnemyController ennemyController = ennemy.GetComponent<EnnemyController>();
             GameObject posInGraph = ennemyController.PositionInGraph;
-            Debug.Log(posInGraph);
             if (posInGraph == null)
-            {
-                ennemyController.WaypointToGo = Vector2.zero;
-                continue;
-            }
-
-            List<Node> localPath = graph.GetPath2(
-                graph.GetNodeByName(PositionToName(posInGraph.transform.position)),
-                graph.GetNodeByName(PositionToName(start.transform.position))
-            );
-
-            if(localPath.Count <= 1)
             {
                 ennemyController.WaypointToGo = Vector2.zero;
                 continue;
@@ -318,13 +298,27 @@ public class GridToGraph : MonoBehaviour
 
             Vector2 offset = Vector2.one * 0.5f;
 
+            List<Node> localPath = graph.GetPath2(
+                graph.GetNodeByPosition((Vector2) posInGraph.transform.position - offset),
+                graph.GetNodeByPosition((Vector2) start.transform.position - offset)
+            );
+            if (localPath.Count <= 1)
+            {
+                ennemyController.WaypointToGo = Vector2.zero;
+                continue;
+            }
+
+
 
             Vector2 ennemyPos = (Vector2) ennemy.transform.position + offset * Vector2.up;
-            Vector2 firstWP = (Vector2)NameToPosition(localPath[0].Name) + offset;
-            Vector2 secondWP = (Vector2)NameToPosition(localPath[1].Name) + offset;
+            Vector2 firstWP = localPath[0].Position + offset;
+            Vector2 secondWP = localPath[1].Position + offset;
 
             Vector2 dirToFirstWP = GetDirection(ennemyPos, firstWP); 
             Vector2 dirToSecondWP = GetDirection(ennemyPos, secondWP);
+
+            Debug.DrawLine(ennemyPos, ennemyPos + dirToSecondWP, Color.green);
+            Debug.DrawLine(ennemyPos, ennemyPos + dirToFirstWP, Color.red);
 
             int nextWP;
             if (IsInWaypoint(ennemyPos, firstWP))
@@ -361,23 +355,27 @@ public class GridToGraph : MonoBehaviour
             if (nextWP == 1)
             {
                 dirInt =
-                    (Vector2)NameToPosition(PositionToName((Vector2) posInGraph.transform.position))
+                    (Vector2)posInGraph.transform.position
                     -
-                    (Vector2)NameToPosition(localPath[nextWP].Name);
+                    localPath[nextWP].Position;
                 dirInt.Normalize();
             }
 
             if(nextWP == 0)
             {
+                Vector2 p = Vector2Int.FloorToInt(ennemy.transform.position);
+                Debug.Log(p);
                 dirInt = (
-                    (Vector2)NameToPosition(localPath[nextWP].Name) + offset
+                    localPath[nextWP].Position + offset
                     -
-                    ((Vector2)ennemy.transform.position + Vector2.up * offset)
+                    (p + offset)
                 );
                 dirInt.x *= -1;
                 dirInt.y *= dirToSecondWP.y;
                 dirInt.Normalize();
             }
+
+            Debug.DrawLine(ennemyPos, ennemyPos + dirInt, Color.white);
 
             ennemyController.WaypointToGo = dirInt;
             paths.Add(localPath);

@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Node
 {
-    public string Name { get; }
+    public Vector2 Position { get; }
 
-    public Dictionary<Node, float> Neighboors { get; }
+    public Dictionary<Node, float> Neighbors { get; }
 
     public State Status { get; set; }
 
@@ -19,23 +19,23 @@ public class Node
         End
     }
 
-    public Node(string name)
+    public Node(Vector2 pos)
     {
-        Neighboors = new Dictionary<Node, float>();
-        Name = name;
+        Neighbors = new Dictionary<Node, float>();
+        Position = pos;
         Status = State.Present;
     }
 
-    public void AddNeighboor(Node n, float cost)
+    public void AddNeighbor(Node n, float cost)
     {
-        Neighboors.Add(n, cost);
+        Neighbors.Add(n, cost);
     }
 
-    public Node GetClosestNeighboor()
+    public Node GetClosestNeighbor()
     {
-        if (Neighboors.Count == 0) return null;
-        var closest = Neighboors.First();
-        foreach (var neighboor in Neighboors)
+        if (Neighbors.Count == 0) return null;
+        var closest = Neighbors.First();
+        foreach (var neighboor in Neighbors)
         {
             if(neighboor.Value < closest.Value)
             {
@@ -47,9 +47,9 @@ public class Node
 
     public int GetLengthTo(Node neigh)
     {
-        foreach(var no in Neighboors)
+        foreach(var neighborNode in Neighbors)
         {
-            if(no.Key.Name == neigh.Name) return (int) no.Value;
+            if(neighborNode.Key.Position == neigh.Position) return (int) neighborNode.Value;
         }
         return 0;
     }
@@ -57,7 +57,7 @@ public class Node
     public List<Node> GetNeighboors()
     {
         List<Node> n = new();
-        foreach (var nodes in Neighboors)
+        foreach (var nodes in Neighbors)
         {
             n.Add(nodes.Key);
         }
@@ -66,11 +66,12 @@ public class Node
 
     public override string ToString()
     {
-        string s = $"Node ({Name}) - Voisins ({Neighboors.Count}): \n";
-        foreach (var node in Neighboors)
-        {
-            s += "\t Node " + node.Key.Name;
-        }
-        return s + "\n";
+        return "";
+        //string s = $"Node ({Name}) - Voisins ({Neighboors.Count}): \n";
+        //foreach (var node in Neighboors)
+        //{
+        //    s += "\t Node " + node.Key.Name;
+        //}
+        //return s + "\n";
     }
 }

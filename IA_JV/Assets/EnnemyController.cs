@@ -25,7 +25,6 @@ public class EnnemyController : MonoBehaviour
         set
         {
             canMove = true;
-            Debug.Log(value);
             dir = new Vector3(value.x, value.y, 0);
         }
     }
