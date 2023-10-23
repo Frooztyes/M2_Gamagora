@@ -173,24 +173,33 @@ public class GridToGraph : MonoBehaviour
     private Dictionary<Vector2, Transform> GetElements()
     {
         Dictionary<Vector2, Transform> elements = new Dictionary<Vector2, Transform>();
-        int children = Grid.childCount;
+        // récupérer selon le tag node
+
+        GameObject[] start = GameObject.FindGameObjectsWithTag("Start");
+        foreach(GameObject go in start)
+        {
+            go.tag = "Node";
+        }
+        GameObject[] end = GameObject.FindGameObjectsWithTag("End");
+        foreach (GameObject go in end)
+        {
+            go.tag = "Node";
+        }
+
+        GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
+
+        int children = nodes.Length;
         for (int i = 0; i < children; ++i)
         {
-            Vector2 pos = new(Mathf.Floor(Grid.GetChild(i).position.x), Mathf.Floor(Grid.GetChild(i).position.y));
+            Vector2 pos = new(Mathf.Floor(nodes[i].transform.position.x), Mathf.Floor(nodes[i].transform.position.y));
             if (!elements.ContainsKey(pos))
             {
-                Grid.GetChild(i).gameObject.SetActive(true);
-                //Grid.GetChild(i).gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                nodes[i].transform.gameObject.SetActive(true);
+                //nodes[i].transform.gameObject.GetComponent<SpriteRenderer>().enabled = false;
                 elements.Add(
                     pos,
-                    Grid.GetChild(i)
+                    nodes[i].transform
                 );
-                //Grid.GetChild(i).name = PositionToName(Grid.GetChild(i).position);
-                if(Grid.GetChild(i).CompareTag("Start") || Grid.GetChild(i).CompareTag("End"))
-                {
-                    Grid.GetChild(i).tag = "Node";
-                }
-                //Grid.GetChild(i).tag = "Untagged";
             }
         }
 
@@ -224,15 +233,15 @@ public class GridToGraph : MonoBehaviour
     bool IsInWaypoint(Vector2 ennemy, Vector2 waypoint)
     {
         Vector2 dir = ennemy - waypoint;
-        return Mathf.Abs(dir.x) < 0.05f && Mathf.Abs(dir.y) < 0.15f;
+        return Mathf.Abs(dir.x) < 0.05f && Mathf.Abs(dir.y) < 0.10f;
     }
 
     Vector2 GetDirection(Vector2 from, Vector2 to)
     {
         Vector2 dir = from - to;
-        if (dir.x != 0 && Mathf.Abs(dir.x) > 0.01) dir.x = 1 * dir.x > 0 ? 1 : -1;
+        if (dir.x != 0 && Mathf.Abs(dir.x) > 0.01) dir.x = 1 * dir.x > 0 ? -1 : 1;
         else dir.x = 0;
-        if (dir.y != 0 && Mathf.Abs(dir.y) > 0.02) dir.y = 1 * dir.y > 0 ? 1 : -1;
+        if (dir.y != 0 && Mathf.Abs(dir.y) > 0.02) dir.y = 1 * dir.y > 0 ? -1 : 1;
         else dir.y = 0;
         return dir;
     }
@@ -268,11 +277,11 @@ public class GridToGraph : MonoBehaviour
         }
 
 
-        int children = Grid.childCount;
-        for (int i = 0; i < children; ++i)
-        {
-            Grid.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, opacity);
-        }
+        //int children = Grid.childCount;
+        //for (int i = 0; i < children; ++i)
+        //{
+        //    .GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, opacity);
+        //}
 
         graph = CreateGraph();
         start = GameObject.FindGameObjectWithTag("Start");
@@ -307,8 +316,6 @@ public class GridToGraph : MonoBehaviour
                 ennemyController.WaypointToGo = Vector2.zero;
                 continue;
             }
-
-
 
             Vector2 ennemyPos = (Vector2) ennemy.transform.position + offset * Vector2.up;
             Vector2 firstWP = localPath[0].Position + offset;
@@ -350,32 +357,42 @@ public class GridToGraph : MonoBehaviour
                     }
                 }
             }
-
+            Debug.Log(nextWP);
             Vector2 dirInt = Vector2.zero;
             if (nextWP == 1)
             {
-                dirInt =
-                    (Vector2)posInGraph.transform.position
-                    -
-                    localPath[nextWP].Position;
+                Vector2 scndPos = localPath[nextWP].Position + offset;
+                Vector2 firstPos = (Vector2)posInGraph.transform.position;
+                dirInt = GetDirection(firstPos, scndPos);
+                Debug.DrawLine(firstPos, scndPos);
                 dirInt.Normalize();
             }
 
             if(nextWP == 0)
             {
-                Vector2 p = Vector2Int.FloorToInt(ennemy.transform.position);
-                Debug.Log(p);
-                dirInt = (
-                    localPath[nextWP].Position + offset
-                    -
-                    (p + offset)
-                );
-                dirInt.x *= -1;
-                dirInt.y *= dirToSecondWP.y;
+                Vector2 firstPos = (Vector2) ennemy.transform.position;
+                Vector2 scndPos = localPath[nextWP].Position + offset;
+                Vector2 dirNoInt = firstPos - scndPos;
+                Debug.Log(dirNoInt);
+                if (Mathf.Abs(dirNoInt.x) < Mathf.Abs(dirNoInt.y) && IsInWaypoint(firstPos, scndPos))
+                {
+                    firstPos.x = 0;
+                    scndPos.x = 0;
+                }
+                dirInt = GetDirection(firstPos, scndPos);
+                if((localPath[nextWP + 1].Position + offset).y < firstPos.y)
+                {
+                    dirInt.y = -dirInt.y;
+                }
+
+                Debug.Log(dirInt);
+
+                Debug.DrawLine(firstPos, scndPos);
+
                 dirInt.Normalize();
             }
 
-            Debug.DrawLine(ennemyPos, ennemyPos + dirInt, Color.white);
+            Debug.DrawLine(ennemyPos, ennemyPos + dirInt, Color.magenta);
 
             ennemyController.WaypointToGo = dirInt;
             paths.Add(localPath);

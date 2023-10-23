@@ -47,7 +47,7 @@ public class EnnemyController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         dir = Vector2.zero;
         canMove = true;
-        defaultFacing = true;
+        defaultFacing = false;
     }
 
     // Update is called once per frame
@@ -56,7 +56,7 @@ public class EnnemyController : MonoBehaviour
         if(canMove && dir != Vector3.zero)
         {
 
-            rb.MovePosition(transform.position - moveSpeedInternal * Time.fixedDeltaTime * dir);
+            rb.MovePosition(transform.position + moveSpeedInternal * Time.fixedDeltaTime * dir);
             if(dir.y != 0)
             {
                 if (transform.position.x > player.position.x && defaultFacing) FlipCharacter();

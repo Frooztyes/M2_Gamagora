@@ -212,21 +212,13 @@ public class ChunkGenerator : MonoBehaviour
 
     void DeactivateChunks()
     {
+        if (chunks == null) return;
         int borneInf = RenderDistance / 2;
         int borneSup = RenderDistance % 2 == 0 ? RenderDistance / 2 : (RenderDistance / 2) + 1;
 
         foreach (var chunk in chunks)
         {
-            if(chunk.Key >= GetPlayerChunk() - borneInf || chunk.Key < GetPlayerChunk() + borneSup)
-            {
-                //if(!chunk.Value.IsActive)
-                //{
-                //    chunk.Value.DeactivateChunk(tilemap, background);
-                //}
-            } else
-            {
-                chunk.Value.DeactivateChunk(tilemap, background);
-            }
+            chunk.Value.DeactivateChunk(tilemap, background);
         }
 
 
