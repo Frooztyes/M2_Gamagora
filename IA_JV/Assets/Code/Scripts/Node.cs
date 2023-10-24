@@ -31,6 +31,11 @@ public class Node
         Neighbors.Add(n, cost);
     }
 
+    public void RemoveNeighbor(Node n)
+    {
+        Neighbors.Remove(Neighbors.Where(z => z.Key.Position == n.Position).FirstOrDefault().Key);
+    }
+
     public Node GetClosestNeighbor()
     {
         if (Neighbors.Count == 0) return null;
@@ -66,12 +71,11 @@ public class Node
 
     public override string ToString()
     {
-        return "";
-        //string s = $"Node ({Name}) - Voisins ({Neighboors.Count}): \n";
-        //foreach (var node in Neighboors)
-        //{
-        //    s += "\t Node " + node.Key.Name;
-        //}
-        //return s + "\n";
+        string s = $"Node ({Position}) - Voisins ({Neighbors.Count}): \n";
+        foreach (var node in Neighbors)
+        {
+            s += "\t Node " + node.Key.Position;
+        }
+        return s + "\n";
     }
 }

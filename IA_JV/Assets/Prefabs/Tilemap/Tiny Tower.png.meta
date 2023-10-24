@@ -5888,6 +5888,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Lamp
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 448
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79ff4e463ead19c43b796b7a6c3ff378
+      internalID: 2055009156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -5903,6 +5924,7 @@ TextureImporter:
       Cobblestrone02: 1435887668
       Cobblestrone03: -1915923234
       Cobblestrone04: 928812376
+      Lamp: 2055009156
       PlankStone01: 1569100656
       PlankStone02: 1672230862
       PlankStone03: 1153143149
@@ -5911,7 +5933,6 @@ TextureImporter:
       Rock02: 382318844
       Rock03: -1178561898
       Rock04: 68424119
-      Tiny Tower_0: 2055009156
       Tiny Tower_1: 492266648
       Tiny Tower_10: 2121095916
       Tiny Tower_100: 1016168086

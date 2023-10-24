@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -6,19 +7,12 @@ using UnityEngine;
 public class GridToGraph : MonoBehaviour
 {
     [SerializeField] private Transform Grid;
-    [SerializeField] private GameObject block;
+    [SerializeField] private GameObject graphNode;
 
     Dictionary<Vector2, Transform> elements;
     List<List<Node>> paths;
 
-    Vector3 NameToPosition(string name)
-    {
-        string[] pos = name.Split(",");
-        float x = Mathf.Floor(float.Parse(pos[0]));
-        float y = Mathf.Floor(float.Parse(pos[1]));
-        return new Vector3(x, y, 0);
-    }
-
+    Vector2 offset = Vector2.one * 0.5f;
 
     Graph CreateGraph()
     {
@@ -34,7 +28,7 @@ public class GridToGraph : MonoBehaviour
 
             foreach (Transform no in neighboors)
             {
-                node.AddNeighbor(new Node((Vector2) no.position - Vector2.one * 0.5f), 1);
+                node.AddNeighbor(new Node(no.position), 1);
             }
         }
 
@@ -70,7 +64,6 @@ public class GridToGraph : MonoBehaviour
         {
             graph.RemoveNode(n);
         }
-
         return graph;
     }
 
@@ -107,14 +100,24 @@ public class GridToGraph : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Vector2 offset = Vector2.one * 0.5f;
         if(graph == null) return;
         Color defaultColor = Color.grey;
         float thickness = 3.0f;
         Handles.color = defaultColor;
         foreach (Node node in graph.Nodes.Values)
         {
+            Handles.color = defaultColor;
             if (!elements.TryGetValue(node.Position, out Transform t)) continue;
+
+
+            foreach (var neighbor in node.Neighbors)
+            {
+                Handles.DrawLine(
+                    node.Position,
+                    neighbor.Key.Position,
+                    thickness
+                );
+            }
 
             if (t.CompareTag("Start"))
             {
@@ -131,22 +134,15 @@ public class GridToGraph : MonoBehaviour
 
             if (t.CompareTag("DeactivatedNode")) continue;
             Handles.DrawSolidDisc(
-                node.Position + offset, 
+                node.Position, 
                 -Vector3.forward, 
                 0.2f
             );
 
-            foreach(var neighbor in node.Neighbors)
-            {
-                Handles.DrawLine(
-                    node.Position + offset, 
-                    neighbor.Key.Position + offset, 
-                    thickness
-                );
-            }
-
         }
 
+        Handles.color = defaultColor;
+        return;
         if (paths == null) return;
         if (paths.Count == 0) return;
 
@@ -158,9 +154,10 @@ public class GridToGraph : MonoBehaviour
                 {
                     if (nodes.Contains(neighbor.Key)) Handles.color = Color.blue;
                     else Handles.color = defaultColor;
+
                     Handles.DrawLine(
-                        node.Position + offset,
-                        neighbor.Key.Position + offset,
+                        node.Position,
+                        neighbor.Key.Position,
                         thickness
                     );
                 }
@@ -169,236 +166,6 @@ public class GridToGraph : MonoBehaviour
 
     }
 #endif
-
-    private Dictionary<Vector2, Transform> GetElements()
-    {
-        Dictionary<Vector2, Transform> elements = new Dictionary<Vector2, Transform>();
-        // récupérer selon le tag node
-
-        GameObject[] start = GameObject.FindGameObjectsWithTag("Start");
-        foreach(GameObject go in start)
-        {
-            go.tag = "Node";
-        }
-        GameObject[] end = GameObject.FindGameObjectsWithTag("End");
-        foreach (GameObject go in end)
-        {
-            go.tag = "Node";
-        }
-
-        GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
-
-        int children = nodes.Length;
-        for (int i = 0; i < children; ++i)
-        {
-            Vector2 pos = new(Mathf.Floor(nodes[i].transform.position.x), Mathf.Floor(nodes[i].transform.position.y));
-            if (!elements.ContainsKey(pos))
-            {
-                nodes[i].transform.gameObject.SetActive(true);
-                //nodes[i].transform.gameObject.GetComponent<SpriteRenderer>().enabled = false;
-                elements.Add(
-                    pos,
-                    nodes[i].transform
-                );
-            }
-        }
-
-        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
-        Vector2 posPlayerI = player.position;
-        posPlayerI.y += player.GetComponent<SpriteRenderer>().bounds.size.y / 2;
-
-        Vector2 posPlayer = new(Mathf.Floor(posPlayerI.x), Mathf.Floor(posPlayerI.y));
-        if (elements.TryGetValue(posPlayer, out Transform t))
-        {
-            t.gameObject.tag = "Start";
-        } else
-        {
-            //Debug.Log("Not");
-        }
-
-        //if (!elements.ContainsKey(posPlayer))
-        //{
-        //     instantier place perso à la position +1 et retirer à chaque boucle si pas le meme
-
-        //    start = Instantiate(block, player.transform.position, Quaternion.identity);
-        //    elements.Add(
-        //        posPlayer,
-        //        player
-        //    );
-        //}
-        return elements;
-    }
-
-
-    bool IsInWaypoint(Vector2 ennemy, Vector2 waypoint)
-    {
-        Vector2 dir = ennemy - waypoint;
-        return Mathf.Abs(dir.x) < 0.05f && Mathf.Abs(dir.y) < 0.10f;
-    }
-
-    Vector2 GetDirection(Vector2 from, Vector2 to)
-    {
-        Vector2 dir = from - to;
-        if (dir.x != 0 && Mathf.Abs(dir.x) > 0.01) dir.x = 1 * dir.x > 0 ? -1 : 1;
-        else dir.x = 0;
-        if (dir.y != 0 && Mathf.Abs(dir.y) > 0.02) dir.y = 1 * dir.y > 0 ? -1 : 1;
-        else dir.y = 0;
-        return dir;
-    }
-
-
-    GameObject start;
-    GameObject[] end;
-    Graph graph;
-    GameObject[] ennemies;
-    private void Update()
-    {
-        float opacity = 0f;
-        elements = GetElements();
-
-
-        ennemies = GameObject.FindGameObjectsWithTag("Ennemy");
-
-        foreach (GameObject ennemy in ennemies)
-        {
-            Vector2 posI = ennemy.transform.position;
-            posI.y += ennemy.GetComponent<SpriteRenderer>().bounds.size.y / 2;
-
-            Vector2 pos = new(Mathf.Floor(posI.x), Mathf.Floor(posI.y));
-
-            if (elements.TryGetValue(pos, out Transform t))
-            {
-                t.gameObject.tag = "End";
-                ennemy.GetComponent<EnnemyController>().PositionInGraph = t.gameObject;
-            } else
-            {
-                ennemy.GetComponent<EnnemyController>().Stop();
-            }
-        }
-
-
-        //int children = Grid.childCount;
-        //for (int i = 0; i < children; ++i)
-        //{
-        //    .GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, opacity);
-        //}
-
-        graph = CreateGraph();
-        start = GameObject.FindGameObjectWithTag("Start");
-        if (start == null)
-            return;
-
-        end = GameObject.FindGameObjectsWithTag("End");
-        if (end == null)
-            return;
-
-
-        paths = new List<List<Node>>();
-
-        foreach (GameObject ennemy in ennemies)
-        {
-            EnnemyController ennemyController = ennemy.GetComponent<EnnemyController>();
-            GameObject posInGraph = ennemyController.PositionInGraph;
-            if (posInGraph == null)
-            {
-                ennemyController.WaypointToGo = Vector2.zero;
-                continue;
-            }
-
-            Vector2 offset = Vector2.one * 0.5f;
-
-            List<Node> localPath = graph.GetPath2(
-                graph.GetNodeByPosition((Vector2) posInGraph.transform.position - offset),
-                graph.GetNodeByPosition((Vector2) start.transform.position - offset)
-            );
-            if (localPath.Count <= 1)
-            {
-                ennemyController.WaypointToGo = Vector2.zero;
-                continue;
-            }
-
-            Vector2 ennemyPos = (Vector2) ennemy.transform.position + offset * Vector2.up;
-            Vector2 firstWP = localPath[0].Position + offset;
-            Vector2 secondWP = localPath[1].Position + offset;
-
-            Vector2 dirToFirstWP = GetDirection(ennemyPos, firstWP); 
-            Vector2 dirToSecondWP = GetDirection(ennemyPos, secondWP);
-
-            Debug.DrawLine(ennemyPos, ennemyPos + dirToSecondWP, Color.green);
-            Debug.DrawLine(ennemyPos, ennemyPos + dirToFirstWP, Color.red);
-
-            int nextWP;
-            if (IsInWaypoint(ennemyPos, firstWP))
-            {
-                nextWP = 1; 
-            } 
-            else
-            {
-                if (dirToFirstWP.x == dirToSecondWP.x)
-                {
-                    if(dirToFirstWP.y == dirToSecondWP.y)
-                    {
-                        nextWP = 1;
-                    } 
-                    else
-                    {
-                        nextWP = 0;
-                    }
-                }
-                else
-                {
-                    if (dirToFirstWP.y == dirToSecondWP.y && dirToFirstWP.y != 0)
-                    {
-                        nextWP = 0;
-                    }
-                    else
-                    {
-                        nextWP = 1;
-                    }
-                }
-            }
-            Debug.Log(nextWP);
-            Vector2 dirInt = Vector2.zero;
-            if (nextWP == 1)
-            {
-                Vector2 scndPos = localPath[nextWP].Position + offset;
-                Vector2 firstPos = (Vector2)posInGraph.transform.position;
-                dirInt = GetDirection(firstPos, scndPos);
-                Debug.DrawLine(firstPos, scndPos);
-                dirInt.Normalize();
-            }
-
-            if(nextWP == 0)
-            {
-                Vector2 firstPos = (Vector2) ennemy.transform.position;
-                Vector2 scndPos = localPath[nextWP].Position + offset;
-                Vector2 dirNoInt = firstPos - scndPos;
-                Debug.Log(dirNoInt);
-                if (Mathf.Abs(dirNoInt.x) < Mathf.Abs(dirNoInt.y) && IsInWaypoint(firstPos, scndPos))
-                {
-                    firstPos.x = 0;
-                    scndPos.x = 0;
-                }
-                dirInt = GetDirection(firstPos, scndPos);
-                if((localPath[nextWP + 1].Position + offset).y < firstPos.y)
-                {
-                    dirInt.y = -dirInt.y;
-                }
-
-                Debug.Log(dirInt);
-
-                Debug.DrawLine(firstPos, scndPos);
-
-                dirInt.Normalize();
-            }
-
-            Debug.DrawLine(ennemyPos, ennemyPos + dirInt, Color.magenta);
-
-            ennemyController.WaypointToGo = dirInt;
-            paths.Add(localPath);
-        }
-    }
-
 
     private List<Transform> Voisins(Vector2 position)
     {
@@ -415,4 +182,195 @@ public class GridToGraph : MonoBehaviour
 
         return list;
     }
+
+    private Dictionary<Vector2, Transform> GetElements()
+    {
+        Dictionary<Vector2, Transform> elements = new Dictionary<Vector2, Transform>();
+        // récupérer selon le tag node
+
+        GameObject[] start = GameObject.FindGameObjectsWithTag("Start");
+        foreach(GameObject go in start)
+        {
+            go.tag = "Node";
+        }
+
+        GameObject[] end = GameObject.FindGameObjectsWithTag("End");
+        foreach (GameObject go in end)
+        {
+            go.tag = "Node";
+        }
+
+        GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
+        for (int i = 0; i < nodes.Length; ++i)
+        {
+            Vector2 pos = new Vector2(
+                Mathf.Floor(nodes[i].transform.position.x), 
+                Mathf.Floor(nodes[i].transform.position.y)
+            );
+
+            if (!elements.ContainsKey(pos))
+            {
+                nodes[i].transform.gameObject.SetActive(true);
+                elements.Add(
+                    pos + offset,
+                    nodes[i].transform
+                );
+            }
+        }
+
+        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
+        Vector2 posPlayerI = player.position;
+        posPlayerI.y += player.GetComponent<SpriteRenderer>().bounds.size.y / 2;
+
+        if (elements.TryGetValue(Vector2Int.FloorToInt(posPlayerI) + offset, out Transform t))
+        {
+            t.gameObject.tag = "Start";
+        } 
+        else
+        {
+        }
+        return elements;
+    }
+
+
+    bool IsInWaypoint(Vector2 ennemy, Vector2 waypoint)
+    {
+        Vector2 dir = ennemy - waypoint;
+        return Mathf.Abs(dir.x) < 0.05f && Mathf.Abs(dir.y) < 0.05f;
+    }
+
+    Vector2 GetHardDirection(Vector2 from, Vector2 to)
+    {
+        Vector2 dir = from - to;
+        if (dir.x != 0 && Mathf.Abs(dir.x) > 0.01) dir.x = 1 * dir.x > 0 ? -1 : 1;
+        else dir.x = 0;
+        if (dir.y != 0 && Mathf.Abs(dir.y) > 0.02) dir.y = 1 * dir.y > 0 ? -1 : 1;
+        else dir.y = 0;
+        return dir;
+    }
+
+
+    GameObject start;
+    GameObject[] end;
+    Graph graph;
+    GameObject[] ennemies;
+
+    private GameObject[] SetupEnnemies()
+    {
+        GameObject[] ennemies = GameObject.FindGameObjectsWithTag("Ennemy");
+        foreach (GameObject ennemy in ennemies)
+        {
+            Vector2 positionEnnemy = ennemy.transform.position;
+            
+            // résolution du problème d'ancrage
+            positionEnnemy.y += ennemy.GetComponent<SpriteRenderer>().bounds.size.y / 2;
+
+            // améliorer le calcul
+            Transform t;
+            if (elements.TryGetValue(Vector2Int.FloorToInt(positionEnnemy) + offset, out t))
+            {
+                t.gameObject.tag = "End";
+                ennemy.GetComponent<EnnemyController>().PositionInGraph = t.gameObject;
+            }
+            else
+            {
+                // s'il n'est pas sur un noeud, on l'arrête
+                t = CreateGraphNode(Vector2Int.FloorToInt(positionEnnemy) + offset).transform;
+                ennemy.GetComponent<EnnemyController>().PositionInGraph = t.gameObject;
+            }
+        }
+        return ennemies;
+    }
+
+    private GameObject CreateGraphNode(Vector3 position)
+    {
+        GameObject g = Instantiate(graphNode, position, Quaternion.identity);
+        g.transform.parent = Grid.transform;
+        return g;
+    }
+
+    private void CalculatePath()
+    {
+        foreach (GameObject ennemy in ennemies)
+        {
+            EnnemyController ennemyController = ennemy.GetComponent<EnnemyController>();
+            GameObject posInGraph = ennemyController.PositionInGraph;
+            
+            if (posInGraph == null)
+            {
+                ennemyController.WaypointToGo = Vector2.zero;
+                continue;
+            }
+
+
+            Vector2 from = (Vector2)posInGraph.transform.position;
+            Vector2 to = (Vector2)start.transform.position;
+            Node fromNode = graph.GetNodeByPosition(from);
+            Node toNode = graph.GetNodeByPosition(to);
+            if (fromNode == null || toNode == null) continue;
+
+            List<Node> localPath = graph.GetPath(fromNode, toNode);
+
+            List<Node> lastPath = ennemyController.lastPath;
+            Vector2 gotoPosition;
+
+            Vector2 ennemyPos = (Vector2)ennemy.transform.position;
+
+
+            if (lastPath != null && IsInWaypoint(ennemyPos + 0.5f * Vector2.up, lastPath[1].Position))
+            {
+                // si on est pile sur le noeud, on va sur le prochain de la liste, 
+                // c-à-d le prochain de localPath
+                ennemyController.lastPath = localPath;
+            }
+
+            if (lastPath != null && lastPath[1].Position == localPath[0].Position)
+            {
+                // si on est sur le noeud et que le noeud du joueur est le meme
+                // localPath[0] est égal à la position de l'ennemi
+                // dans ce cas là le premier noeud de notre chemin est le même que le deuxième de notre ancien chemin
+                gotoPosition = lastPath[1].Position;
+            }
+            else
+            {
+                // on se rend au deuxième noeud de notre graphe
+                // car on n'est pas sur la position
+                gotoPosition = localPath[1].Position;
+            }
+            if (lastPath == null)
+                ennemyController.lastPath = localPath;
+
+            ennemyController.WaypointToGo = gotoPosition;
+        }
+    }
+
+    private void Update()
+    {
+        //RemoveTemporary();
+        // TODO: optimiser récupération des noeuds
+        elements = GetElements();
+
+        // TODO: optimiser le positionnement des ennemis
+        ennemies = SetupEnnemies();
+        
+        // TODO: modifier l'appel à cette fonction
+        graph = CreateGraph();
+
+
+        start = GameObject.FindGameObjectWithTag("Start");
+        if (start == null)
+            return;
+
+        end = GameObject.FindGameObjectsWithTag("End");
+        if (end == null)
+            return;
+
+
+        paths = new List<List<Node>>();
+
+        CalculatePath();
+    }
+
+
+    
 }
