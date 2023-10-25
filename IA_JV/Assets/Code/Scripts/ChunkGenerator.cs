@@ -8,35 +8,37 @@ using UnityEngine.UIElements;
 
 public class ChunkGenerator : MonoBehaviour
 {
+    [Header("Tilemaps")]
     [SerializeField] private Tilemap chunkTemplate;
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private Tilemap ladders;
     [SerializeField] private Tilemap background;
 
-
-    [SerializeField] private Transform grid;
+    [Header("Type tiles")]
     [SerializeField] private TileBase ladderTile;
     [SerializeField] private TileBase ladderTopTile;
     [SerializeField] private TileBase backgroundTile;
-    [SerializeField] private GameObject grid2; 
 
-    [SerializeField] private GameObject graphNode;
-    
+    [Header("Lights")]
     [SerializeField] private TileBase lightTile;
     [SerializeField] private GameObject lightPrefab;
 
-    [SerializeField] private GameObject jewelPrefab;
+    [Header("Nodes")]
+    [SerializeField] private GameObject grid2;
+    [SerializeField] private GameObject graphNode;
 
+    [Header("Miscellaneous")]
+    [SerializeField] private Transform grid;
+    [SerializeField] private GameObject jewelPrefab;
     [SerializeField] private int RenderDistance = 5;
+    //[SerializeField] private GameObject spawnerTrigger;
+
+
 
     Chunk chunk;
-
     Dictionary<int, ChunkInfo> chunks;
-
     Transform player;
     Vector3Int startPoint;
-    int firstChunk;
-
     TextMeshProUGUI floorText;
 
     // Start is called before the first frame update
@@ -48,26 +50,15 @@ public class ChunkGenerator : MonoBehaviour
         chunk = new Chunk(chunkTemplate);
         chunks = new Dictionary<int, ChunkInfo>();
 
-        currentChunkId = GetPlayerChunk();
-
         startPoint = Vector3Int.FloorToInt(transform.position - chunk.Left * Vector3.right - chunk.Top * Vector3.up);
-
-        firstChunk = startPoint.y;
-
-        //chunks.Add(currentChunkId, new List<GameObject>());
-
-        //GenerateChunk();
-        //startPoint = Vector3Int.FloorToInt(transform.position - chunk.Left * Vector3.right - chunk.Top * Vector3.up);
-        //currentChunkId++;
     }
+
     private int GetPlayerChunk()
     {
         if (player == null) return 0;
         if (chunk == null) return 0;
         return (int) (player.position.y / (chunk.Bottom - chunk.Top)) - 2;
     }
-
-    int currentChunkId;
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -171,6 +162,22 @@ public class ChunkGenerator : MonoBehaviour
         return lights;
     }
 
+    void GenerateSpawner(float ladderPosition)
+    {
+        Vector3 spawnPoint;
+        if(Random.value < 0.5)
+        {
+            spawnPoint = new Vector3(chunk.InnerLeft, chunk.InnerBottom);
+        } 
+        else
+        {
+            spawnPoint = new Vector3(chunk.InnerRight, chunk.InnerBottom);
+        }
+        SpawnEnnemy s /*= Instantiate()*/;
+        // s.EnnemySpawn = spawnPoint;
+        // s.transform.position = new Vector3(ladderPosition, chunk.InnerBottom);
+    }
+
     private List<GameObject> GenerateJewels()
     {
         List<GameObject> jewels = new List<GameObject>();
@@ -261,7 +268,6 @@ public class ChunkGenerator : MonoBehaviour
             {
                 startPoint = Vector3Int.FloorToInt(transform.position - chunk.Left * Vector3.right - chunk.Top * Vector3.up);
                 startPoint.y -= (chunk.Top - chunk.Bottom) * i;
-                currentChunkId = i;
                 ChunkInfo c = GenerateChunk();
                 chunks.Add(i, c);
                 c.ActivateChunk(tilemap, background);

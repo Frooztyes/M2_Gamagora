@@ -142,7 +142,7 @@ public class GridToGraph : MonoBehaviour
         }
 
         Handles.color = defaultColor;
-        return;
+
         if (paths == null) return;
         if (paths.Count == 0) return;
 
@@ -341,6 +341,7 @@ public class GridToGraph : MonoBehaviour
                 ennemyController.lastPath = localPath;
 
             ennemyController.WaypointToGo = gotoPosition;
+            paths.Add(localPath);
         }
     }
 
