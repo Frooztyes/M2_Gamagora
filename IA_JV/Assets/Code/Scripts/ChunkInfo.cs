@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,6 +10,7 @@ public class ChunkInfo
     readonly Dictionary<Vector3Int, TileBase> backgroundPosition;
     readonly List<GameObject> lights;
     readonly List<GameObject> nodes;
+    readonly List<GameObject> jewels;
 
     public bool IsActive;
 
@@ -28,6 +30,16 @@ public class ChunkInfo
         foreach(GameObject light in lights)
         {
             light.SetActive(false);
+        }
+
+        foreach (GameObject jewel in jewels.ToList())
+        {
+            if (jewel == null)
+            {
+                jewels.Remove(jewel);
+                continue;
+            }
+            jewel.SetActive(false);
         }
 
         foreach (GameObject node in nodes)
@@ -56,6 +68,16 @@ public class ChunkInfo
             light.SetActive(true);
         }
 
+        foreach (GameObject jewel in jewels.ToList())
+        {
+            if (jewel == null)
+            {
+                jewels.Remove(jewel);
+                continue;
+            }
+            jewel.SetActive(true);
+        }
+
         foreach (GameObject node in nodes)
         {
             if (!node.CompareTag("Start") || !node.CompareTag("End"))
@@ -68,14 +90,16 @@ public class ChunkInfo
     public ChunkInfo(
         Dictionary<Vector3Int, TileBase> wallsPosition, 
         Dictionary<Vector3Int, TileBase> backgroundPosition, 
-        List<GameObject> lights, 
-        List<GameObject> nodes)
+        List<GameObject> lights,
+        List<GameObject> nodes,
+        List<GameObject> jewels)
     {
         IsActive = false;
         this.wallsPosition = wallsPosition;
         this.backgroundPosition = backgroundPosition;
         this.lights = lights;
         this.nodes = nodes;
+        this.jewels = jewels;
     }
     
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -20,13 +21,18 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private AudioSource ladderSound;
     [SerializeField] private AudioSource walkSound;
 
+    private int nbJewels;
+    private TextMeshProUGUI hudJewels;
+
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         Physics.gravity *= 40;
-        defaultFacing = false;
+        defaultFacing = false; 
+        nbJewels = 0;
     }
 
     private bool isGrounded;
@@ -86,9 +92,20 @@ public class CharacterController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(LayerMask.LayerToName(collision.gameObject.layer) == "Ladders")
+        string layer = LayerMask.LayerToName(collision.gameObject.layer);
+        if (layer == "Ladders")
         {
             canGoUp = true;
+        }
+        if (layer == "Jewel")
+        {
+            if (hudJewels == null)
+            {
+                hudJewels = GameObject.FindGameObjectWithTag("HUD_Jewels").GetComponent<TextMeshProUGUI>();
+            }
+            nbJewels++;
+            hudJewels.text = nbJewels.ToString();
+            Destroy(collision.gameObject);
         }
     }
 

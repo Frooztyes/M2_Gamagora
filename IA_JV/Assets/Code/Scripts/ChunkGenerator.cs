@@ -25,6 +25,8 @@ public class ChunkGenerator : MonoBehaviour
     [SerializeField] private TileBase lightTile;
     [SerializeField] private GameObject lightPrefab;
 
+    [SerializeField] private GameObject jewelPrefab;
+
     [SerializeField] private int RenderDistance = 5;
 
     Chunk chunk;
@@ -169,6 +171,28 @@ public class ChunkGenerator : MonoBehaviour
         return lights;
     }
 
+    private List<GameObject> GenerateJewels()
+    {
+        List<GameObject> jewels = new List<GameObject>();
+        int nbJewels = Random.Range(1, 3);
+        float previousX = float.MaxValue;
+        for (int f = 0; f < nbJewels; f++)
+        {
+            float x;
+            do
+            {
+                x = Random.Range(chunk.InnerLeft, chunk.InnerRight);
+            } while (previousX - 1 <= x && x <= previousX + 1);
+
+            Vector3 position = startPoint + new Vector3(x + 0.5f, chunk.InnerTop + 0.5f, 0);
+
+            GameObject go = Instantiate(jewelPrefab, position, Quaternion.identity);
+            jewels.Add(go);
+            previousX = x;
+        }
+        return jewels;
+    }
+
     private ChunkInfo GenerateChunk()
     {
         Dictionary<Vector3Int, TileBase> tilesWall = new Dictionary<Vector3Int, TileBase>();
@@ -205,8 +229,9 @@ public class ChunkGenerator : MonoBehaviour
         List<int> ladderPosition = GenerateLadderInChunk(nodes, tilesWall);
 
         List<GameObject> lights = GenerateLights(ladderPosition, tilesBg);
+        List<GameObject> jewels = GenerateJewels();
 
-        ChunkInfo chunkInfo = new ChunkInfo(tilesWall, tilesBg, lights, nodes);
+        ChunkInfo chunkInfo = new ChunkInfo(tilesWall, tilesBg, lights, nodes, jewels);
 
         chunkInfo.DeactivateChunk(tilemap, background);
 

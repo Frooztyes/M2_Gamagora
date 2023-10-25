@@ -208,7 +208,7 @@ public class GridToGraph : MonoBehaviour
                 Mathf.Floor(nodes[i].transform.position.y)
             );
 
-            if (!elements.ContainsKey(pos))
+            if (!elements.ContainsKey(pos + offset))
             {
                 nodes[i].transform.gameObject.SetActive(true);
                 elements.Add(

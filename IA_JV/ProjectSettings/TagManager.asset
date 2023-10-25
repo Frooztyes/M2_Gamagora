@@ -10,6 +10,8 @@ TagManager:
   - Node
   - DeactivatedNode
   - FloorText
+  - HUD_Jewels
+  - Jewel
   layers:
   - Default
   - TransparentFX
@@ -18,7 +20,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - Jewel
   - 
   - 
   - 
