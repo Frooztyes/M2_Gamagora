@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 0600f816b735b024b9eca19b863b7658
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - chunkTemplate: {fileID: 8546229095796271284, guid: 6d913baba6e25f74f904571c75d6c49e, type: 3}
+  - tilemap: {instanceID: 0}
+  - ladders: {instanceID: 0}
+  - background: {instanceID: 0}
+  - ladderTile: {fileID: 11400000, guid: 0cc0ef0b889804743991bd9ce4128fa3, type: 2}
+  - ladderTopTile: {fileID: 11400000, guid: cd859a37d5cdb2145852c8d6ead53507, type: 2}
+  - backgroundTile: {fileID: 11400000, guid: 78f37aef91f629c42a18b3dfbb6aeaf7, type: 2}
+  - lightTile: {fileID: 11400000, guid: 2087ffedb15579a40aed4c5a00eaee7b, type: 2}
+  - lightPrefab: {fileID: 3621600706289283521, guid: 64e6ead7594378040aaef98eefc03af1, type: 3}
+  - grid2: {instanceID: 0}
+  - graphNode: {instanceID: 0}
+  - grid: {instanceID: 0}
+  - jewelPrefab: {fileID: 2850992221549606774, guid: 74e723e0c4e4d0f43bf0c403dc049dc9, type: 3}
+  - spawnerTrigger: {fileID: 2892801025553447678, guid: 1d053cd8c498d3840901cc72469b6251, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

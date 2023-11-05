@@ -5909,6 +5909,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: LeftPlatform
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 448
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4286361474e7c6c49ac1de6651d015a8
+      internalID: -581566253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RightPlatform
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 448
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0770a845d23588e4dbe47b8f61e535b4
+      internalID: -297597470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -5925,10 +5967,12 @@ TextureImporter:
       Cobblestrone03: -1915923234
       Cobblestrone04: 928812376
       Lamp: 2055009156
+      LeftPlatform: -581566253
       PlankStone01: 1569100656
       PlankStone02: 1672230862
       PlankStone03: 1153143149
       PlankStone04: -1377650729
+      RightPlatform: -297597470
       Rock01: 188906415
       Rock02: 382318844
       Rock03: -1178561898

@@ -12,6 +12,10 @@ TagManager:
   - FloorText
   - HUD_Jewels
   - Jewel
+  - Bird
+  - AstarNodes
+  - AstarStart
+  - VisualHandlers
   layers:
   - Default
   - TransparentFX
