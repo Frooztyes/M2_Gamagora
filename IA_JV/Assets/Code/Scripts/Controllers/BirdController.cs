@@ -46,7 +46,7 @@ public class BirdController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Vector2 toDir = transform.position - dir;
         if (canMove)

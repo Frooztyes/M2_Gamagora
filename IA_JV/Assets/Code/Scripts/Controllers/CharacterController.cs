@@ -60,6 +60,7 @@ public class CharacterController : MonoBehaviour
         {
             rb.velocity = new Vector2(rb.velocity.x, vertical * ClimbSpeed * Time.deltaTime);
         }
+
         if(vertical != 0 && !isGrounded && !ladderSound.isPlaying)
         {
             ladderSound.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
