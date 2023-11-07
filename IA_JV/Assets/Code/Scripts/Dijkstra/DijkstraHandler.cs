@@ -31,8 +31,7 @@ public class DijkstraHandler : MonoBehaviour
         Node endNode = DijkstraConstructor.UpdateEndPosition(player.position);
         if (endNode == null) return;
 
-        List<EnnemyController> ennemies = new List<EnnemyController>();
-        List<Node> startNodes = DijkstraConstructor.SetupEnnemies(out ennemies);
+        List<Node> startNodes = DijkstraConstructor.SetupEnnemies(out List<EnnemyController> ennemies);
 
         visualHandlers.ResetDijkstraVisuals();
 

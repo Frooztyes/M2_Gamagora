@@ -272,19 +272,16 @@ public sealed class DijkstraConstructor
         if (fromNode == null || toNode == null) return false;
 
         List<Node> localPath = DijkstraGraph.GetPath(fromNode, toNode);
-
         List<Node> lastPath = ennemyController.lastPath;
         Vector2 gotoPosition;
 
         Vector2 ennemyPos = (Vector2)ennemyController.transform.position;
-
 
         if (lastPath != null && IsInWaypoint(ennemyPos + 0.5f * Vector2.up, lastPath[1].Position))
         {
             // si on est pile sur le noeud, on va sur le prochain de la liste, 
             // c-à-d le prochain de localPath
             ennemyController.lastPath = localPath;
-            Debug.Log("Update path");
         }
 
         if (lastPath != null && lastPath[1].Position == localPath[0].Position)
@@ -293,14 +290,12 @@ public sealed class DijkstraConstructor
             // localPath[0] est égal à la position de l'ennemi
             // dans ce cas là le premier noeud de notre chemin est le même que le deuxième de notre ancien chemin
             gotoPosition = lastPath[1].Position;
-            Debug.Log("Last path");
         }
         else
         {
             // on se rend au deuxième noeud de notre graphe
             // car on n'est pas sur la position
             gotoPosition = localPath[1].Position;
-            Debug.Log("local path");
 
             if (localPath.Count >= 2)
             {
@@ -311,11 +306,11 @@ public sealed class DijkstraConstructor
                 ennemyController.lastPath = null;
             }
         }
-
+        
         if (lastPath == null)
             ennemyController.lastPath = localPath;
 
-        ennemyController.WaypointToGo = gotoPosition;
+        dir = gotoPosition;
         path = localPath;
         return true;
     }

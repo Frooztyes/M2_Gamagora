@@ -24,7 +24,7 @@ public class EnnemyController : MonoBehaviour
         set
         {
             canMove = true;
-            dir = new Vector3(value.x, value.y, 0);
+            dir = new Vector3(value.x, value.y - 0.5f, 0);
         }
     }
 
@@ -55,8 +55,6 @@ public class EnnemyController : MonoBehaviour
     {
         if(canMove)
         {
-            
-
             Vector3 oldPosition = transform.position;
             transform.position = Vector3.MoveTowards(transform.position, dir, MoveSpeed * Time.fixedDeltaTime);
 
