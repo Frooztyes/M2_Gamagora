@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -66,5 +67,10 @@ public class BirdController : MonoBehaviour
     {
         defaultFacing = !defaultFacing;
         transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+    }
+
+    public void Kill()
+    {
+        Destroy(gameObject);
     }
 }

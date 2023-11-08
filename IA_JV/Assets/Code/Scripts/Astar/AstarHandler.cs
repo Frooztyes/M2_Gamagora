@@ -15,10 +15,13 @@ public class AstarHandler : MonoBehaviour
     private Vector3 size;
     private bool generated = false;
 
+    private VisualHandlers visuals;
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         size = player.GetComponent<SpriteRenderer>().size;
+        visuals = GameObject.FindGameObjectWithTag("VisualHandlers").GetComponent<VisualHandlers>();
     }
 
     public void Generate(List<GameObject> rawNodes)
@@ -37,7 +40,10 @@ public class AstarHandler : MonoBehaviour
         if (end == null)
             return;
 
-        if (Bird == null) return;
+        if (Bird.gameObject == null)
+        {
+            visuals.ResetAstarVisuals();
+        }
 
         if (AstarConstructor.CalculateNextWaypoint(Bird, end, out Vector2 dir))
         {

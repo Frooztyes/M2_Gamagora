@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 563ab2067f433d34d86e5d9d90ac7210
+guid: 99c90ca8a8b223c4aa6434d3b5a7665d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -110,232 +110,274 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Knight_3
+      name: RAVEN_SpriteBig_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 0
+        y: 320
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 30a5c7fcebf9cc34e9b301e8ce6b5d1d
-      internalID: -765551629
+      spriteID: 99e5e8010519ef74b9511a8aeea4b3ec
+      internalID: 767776876
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_4
+      name: RAVEN_SpriteBig_1
       rect:
         serializedVersion: 2
-        x: 90
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 160
+        y: 320
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ae6d4149a52b73a4d95fb55f6ae138b6
-      internalID: -1036829401
+      spriteID: cc807502ff4505e438a2331a5e0969a5
+      internalID: 1642669969
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_5
+      name: RAVEN_SpriteBig_6
       rect:
         serializedVersion: 2
-        x: 154
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 0
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ba4d51e67405d3f4385f3e486b8c9add
-      internalID: 560338297
+      spriteID: 0be3452964a62794797efe809e92b381
+      internalID: 385751804
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_6
+      name: RAVEN_SpriteBig_7
       rect:
         serializedVersion: 2
-        x: 218
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 160
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 199c0556c06181e40a89ece6f6a69d42
-      internalID: -1279617418
+      spriteID: 59acc63a5d842a04f881b2196248bd5d
+      internalID: -580454759
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_7
+      name: RAVEN_SpriteBig_8
       rect:
         serializedVersion: 2
-        x: 282
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 320
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 44afb5abeb0c89440b5f4c54e485b23b
-      internalID: -2015815676
+      spriteID: b16efbb3bfc3e624b9670b9e9c2f9ce2
+      internalID: 2126116938
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_8
+      name: RAVEN_SpriteBig_9
       rect:
         serializedVersion: 2
-        x: 346
-        y: 0
-        width: 11
-        height: 14
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 480
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 637e53abe352ac041af50071725feb6f
-      internalID: 517939210
+      spriteID: 9d0ad31ecd053a8439ca4d14141c152c
+      internalID: 291403743
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_9
+      name: RAVEN_SpriteBig_10
       rect:
         serializedVersion: 2
-        x: 408
-        y: 0
-        width: 17
-        height: 25
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 640
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 91fa53503841b124d8181d4795db5af3
-      internalID: -660101634
+      spriteID: 6b7aebc6af2e6ba4aa6dfff7a3b9aada
+      internalID: -1454434564
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_10
+      name: RAVEN_SpriteBig_11
       rect:
         serializedVersion: 2
-        x: 460
-        y: 0
-        width: 41
-        height: 24
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 800
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82081bc81e8fa41478ef501a82029cf4
-      internalID: 788732546
+      spriteID: 210e934c870970047acd1e3f98afbecd
+      internalID: -86303648
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_11
+      name: RAVEN_SpriteBig_12
       rect:
         serializedVersion: 2
-        x: 524
-        y: 0
-        width: 41
-        height: 19
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 960
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8135de8b9d5596d48a8bbf8ba5327bf3
-      internalID: 808346459
+      spriteID: dec56ead2b904824f99a282a63391ecc
+      internalID: 669697110
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_12
+      name: RAVEN_SpriteBig_13
       rect:
         serializedVersion: 2
-        x: 588
-        y: 0
-        width: 41
-        height: 13
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 1120
+        y: 160
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f8331254fbb7a3c4ba369e09bce7e74b
-      internalID: -723273488
+      spriteID: 54956179e0f637b45908d973118aade9
+      internalID: -2132261425
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Knight_14
+      name: RAVEN_SpriteBig_14
       rect:
         serializedVersion: 2
-        x: 652
+        x: 0
         y: 0
-        width: 41
-        height: 13
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b14a95fbd2de48042a39356826413a5b
-      internalID: 1919467434
+      spriteID: 359c9472ebff34e46848d307a07c264f
+      internalID: -64534947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RAVEN_SpriteBig_15
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d778332f74739ea48897709c45e2437e
+      internalID: -1207977118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RAVEN_SpriteBig_16
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 160
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94a55a69379247a49a4007db9145e610
+      internalID: 347761250
       vertices: []
       indices: 
       edges: []
@@ -343,7 +385,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 74cf76eb9af9c0d4c9e841a5ba4e8d7e
+    spriteID: f491c94baa7e34b46a4871c863050c26
     internalID: 0
     vertices: []
     indices: 
@@ -351,22 +393,25 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Knight_0: 494214683
-      Knight_1: 1330783534
-      Knight_10: 788732546
-      Knight_11: 808346459
-      Knight_12: -723273488
-      Knight_13: 721355748
-      Knight_14: 1919467434
-      Knight_15: 605128062
-      Knight_2: -1637676802
-      Knight_3: -765551629
-      Knight_4: -1036829401
-      Knight_5: 560338297
-      Knight_6: -1279617418
-      Knight_7: -2015815676
-      Knight_8: 517939210
-      Knight_9: -660101634
+      RAVEN_SpriteBig_0: 767776876
+      RAVEN_SpriteBig_1: 1642669969
+      RAVEN_SpriteBig_10: -1454434564
+      RAVEN_SpriteBig_11: -86303648
+      RAVEN_SpriteBig_12: 669697110
+      RAVEN_SpriteBig_13: -2132261425
+      RAVEN_SpriteBig_14: -64534947
+      RAVEN_SpriteBig_15: -1207977118
+      RAVEN_SpriteBig_16: 347761250
+      RAVEN_SpriteBig_17: 349774168
+      RAVEN_SpriteBig_18: 414269275
+      RAVEN_SpriteBig_2: 489864938
+      RAVEN_SpriteBig_3: 786028529
+      RAVEN_SpriteBig_4: -1706735747
+      RAVEN_SpriteBig_5: 1216127887
+      RAVEN_SpriteBig_6: 385751804
+      RAVEN_SpriteBig_7: -580454759
+      RAVEN_SpriteBig_8: 2126116938
+      RAVEN_SpriteBig_9: 291403743
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

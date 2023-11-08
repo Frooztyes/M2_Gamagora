@@ -27,6 +27,7 @@ public class Chunk
 
 
         allTiles = map.GetTilesBlock(bounds);
+        map.GetTile<Tile>(Vector3Int.zero);
 
         Left = int.MaxValue;
         Right = int.MaxValue;

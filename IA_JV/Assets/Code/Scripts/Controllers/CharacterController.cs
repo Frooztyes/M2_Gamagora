@@ -21,6 +21,10 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private AudioSource ladderSound;
     [SerializeField] private AudioSource walkSound;
 
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float attackRange;
+    [SerializeField] private LayerMask ennemyLayer;
+
     private int nbJewels;
     private TextMeshProUGUI hudJewels;
 
@@ -31,11 +35,57 @@ public class CharacterController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         Physics.gravity *= 40;
+        isAttacking = false;
         defaultFacing = false; 
         nbJewels = 0;
     }
 
     private bool isGrounded;
+    private bool isAttacking;
+
+    void Attack()
+    {
+        animator.SetTrigger("IsAttacking");
+        Collider2D[] hits =  Physics2D.OverlapCircleAll(attackPoint.position, attackRange, ennemyLayer);
+        Debug.Log(hits.Length);
+        foreach(Collider2D collider in hits)
+        {
+            int layer = collider.gameObject.layer;
+
+            if(layer == LayerMask.NameToLayer("Bird"))
+            {
+                Debug.Log("oui");
+                BirdController contr = collider.GetComponent<BirdController>();
+
+                contr.Kill();
+
+            }
+            else if (layer == LayerMask.NameToLayer("Skeleton"))
+            {
+                EnnemyController contr = collider.GetComponent<EnnemyController>();
+
+                contr.TakeDamage();
+            }
+
+
+
+
+
+        }
+    }
+
+    //private void OnDrawGizmosSelected()
+    //{
+    //    Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+    //}
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Attack();
+        }
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -66,8 +116,6 @@ public class CharacterController : MonoBehaviour
             ladderSound.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
             ladderSound.Play();
         }
-
-
     }
 
     void CheckGrounded()
@@ -94,6 +142,9 @@ public class CharacterController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         string layer = LayerMask.LayerToName(collision.gameObject.layer);
+
+        if (layer == "Ground") return;
+
         if (layer == "Ladders")
         {
             canGoUp = true;
@@ -107,6 +158,10 @@ public class CharacterController : MonoBehaviour
             nbJewels++;
             hudJewels.text = nbJewels.ToString();
             Destroy(collision.gameObject);
+        }
+        if(layer == "Bird" || layer == "Skeleton")
+        {
+            Destroy(gameObject);
         }
     }
 

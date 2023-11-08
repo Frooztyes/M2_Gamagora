@@ -9,7 +9,8 @@ public class EnnemyController : MonoBehaviour
     public List<Node> lastPath;
 
     [SerializeField] private float MoveSpeed = 1f;
-
+    [SerializeField] private int HealthPoints = 2;
+    private int CurrentHeath;
     private float moveSpeedInternal;
     private Vector3 dir;
     private Transform player;
@@ -48,6 +49,8 @@ public class EnnemyController : MonoBehaviour
         canMove = false;
         defaultFacing = true;
         walkEffect = GetComponent<AudioSource>();
+        CurrentHeath = HealthPoints;
+        isInvicible = false;
     }
 
     // Update is called once per frame
@@ -77,24 +80,33 @@ public class EnnemyController : MonoBehaviour
         }
     }
 
+    private bool isInvicible;
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    private void RemoveInvincibility()
+    {
+        isInvicible = false;
+    }
+
+    public void TakeDamage()
+    {
+        if (isInvicible) return;
+        isInvicible = true;
+        CurrentHeath--;
+        if(CurrentHeath <= 0)
+        {
+            Die();
+        }
+        Invoke(nameof(RemoveInvincibility), 0.5f);
+    }
+
     void FlipCharacter()
     {
         defaultFacing = !defaultFacing;
         transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        //if (LayerMask.LayerToName(collision.gameObject.layer) == "Ladders")
-        //{
-        //    moveSpeedInternal = MoveSpeed / 2;
-        //}
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        //if (LayerMask.LayerToName(collision.gameObject.layer) == "Ladders")
-        //{
-        //    moveSpeedInternal = MoveSpeed;
-        //}
     }
 }

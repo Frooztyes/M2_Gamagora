@@ -28,6 +28,8 @@ public class DijkstraHandler : MonoBehaviour
 
     private void Update()
     {
+        if (player == null) return;
+
         Node endNode = DijkstraConstructor.UpdateEndPosition(player.position);
         if (endNode == null) return;
 
