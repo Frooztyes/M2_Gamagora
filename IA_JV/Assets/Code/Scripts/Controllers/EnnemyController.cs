@@ -10,6 +10,7 @@ public class EnnemyController : MonoBehaviour
 
     [SerializeField] private float MoveSpeed = 1f;
     [SerializeField] private int HealthPoints = 2;
+    [SerializeField] private GameObject deathAnim;
     private int CurrentHeath;
     private float moveSpeedInternal;
     private Vector3 dir;
@@ -51,12 +52,22 @@ public class EnnemyController : MonoBehaviour
         walkEffect = GetComponent<AudioSource>();
         CurrentHeath = HealthPoints;
         isInvicible = false;
+        isDying = false;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(canMove)
+        if (isDying)
+        {
+            if(part == null)
+            {
+                Destroy(gameObject);
+            }
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, 2.5f * Time.fixedDeltaTime);
+        }
+
+        if (canMove)
         {
             Vector3 oldPosition = transform.position;
             transform.position = Vector3.MoveTowards(transform.position, dir, MoveSpeed * Time.fixedDeltaTime);
@@ -80,11 +91,15 @@ public class EnnemyController : MonoBehaviour
         }
     }
 
+    private ParticleSystem part;
+    private bool isDying;
+
     private bool isInvicible;
 
     private void Die()
     {
-        Destroy(gameObject);
+        part = Instantiate(deathAnim, transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
+        isDying = true;
     }
 
     private void RemoveInvincibility()

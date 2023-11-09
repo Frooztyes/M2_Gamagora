@@ -38014,22 +38014,10 @@ PrefabInstance:
       propertyPath: JumpSpeed
       value: 60
       objectReference: {fileID: 0}
-    - target: {fileID: 7126851626672884385, guid: 41002c20aee8a634785e175c6493f4c5, type: 3}
-      propertyPath: m_Mass
-      value: 0.85378575
+    - target: {fileID: 5093420951443491882, guid: 41002c20aee8a634785e175c6493f4c5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7126851626672884385, guid: 41002c20aee8a634785e175c6493f4c5, type: 3}
-      propertyPath: m_GravityScale
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7126851626672884385, guid: 41002c20aee8a634785e175c6493f4c5, type: 3}
-      propertyPath: m_ExcludeLayers.m_Bits
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8868723090131813143, guid: 41002c20aee8a634785e175c6493f4c5, type: 3}
-      propertyPath: m_audioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 1e5dac4c47e8af44c9dc35bb4535dae0, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
