@@ -8,7 +8,7 @@ public class SpawnEnnemy : MonoBehaviour
 
     [HideInInspector] public Vector3 EnnemySpawnPoint;
     public Transform parent;
-
+    private bool hasSpawned = false;
     
     void CreateEnnemy()
     {
@@ -20,8 +20,9 @@ public class SpawnEnnemy : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         string layer = LayerMask.LayerToName(collision.gameObject.layer);
-        if (layer == "Player")
+        if (layer == "Player" && !hasSpawned)
         {
+            hasSpawned = true;
             CreateEnnemy();
             Destroy(gameObject);
         }

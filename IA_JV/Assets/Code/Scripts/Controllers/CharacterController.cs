@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -20,6 +19,8 @@ public class CharacterController : MonoBehaviour
     Animator animator;
     [SerializeField] private AudioSource ladderSound;
     [SerializeField] private AudioSource walkSound;
+    [SerializeField] private AudioSource swordSwoosh;
+    [SerializeField] private AudioSource deathSound;
 
     [SerializeField] private Transform attackPoint;
     [SerializeField] private float attackRange;
@@ -38,13 +39,17 @@ public class CharacterController : MonoBehaviour
         isAttacking = false;
         defaultFacing = false; 
         nbJewels = 0;
+        isDead = false;
     }
 
     private bool isGrounded;
     private bool isAttacking;
+    private bool isDead;
 
     void Attack()
     {
+        swordSwoosh.pitch = Random.Range(0.8f, 1.2f);
+        swordSwoosh.Play();
         animator.SetTrigger("IsAttacking");
         Collider2D[] hits =  Physics2D.OverlapCircleAll(attackPoint.position, attackRange, ennemyLayer);
         Debug.Log(hits.Length);
@@ -54,7 +59,6 @@ public class CharacterController : MonoBehaviour
 
             if(layer == LayerMask.NameToLayer("Bird"))
             {
-                Debug.Log("oui");
                 BirdController contr = collider.GetComponent<BirdController>();
 
                 contr.Kill();
@@ -74,14 +78,14 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    //private void OnDrawGizmosSelected()
-    //{
-    //    Gizmos.DrawWireSphere(attackPoint.position, attackRange);
-    //}
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+    }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetMouseButtonDown(0) && !isDead)
         {
             Attack();
         }
@@ -90,6 +94,7 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (isDead) return;
         CheckGrounded();
 
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -99,7 +104,7 @@ public class CharacterController : MonoBehaviour
         else if (horizontal < 0 && !defaultFacing) FlipCharacter();
         if(horizontal != 0 && !walkSound.isPlaying && isGrounded)
         {
-            walkSound.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
+            walkSound.pitch = Random.Range(0.8f, 1.2f);
             walkSound.Play();
         }
 
@@ -113,7 +118,7 @@ public class CharacterController : MonoBehaviour
 
         if(vertical != 0 && !isGrounded && !ladderSound.isPlaying)
         {
-            ladderSound.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
+            ladderSound.pitch = Random.Range(0.8f, 1.2f);
             ladderSound.Play();
         }
     }
@@ -159,9 +164,13 @@ public class CharacterController : MonoBehaviour
             hudJewels.text = nbJewels.ToString();
             Destroy(collision.gameObject);
         }
-        if(layer == "Bird" || layer == "Skeleton")
+        if((layer == "Bird" || layer == "Skeleton") && !isDead)
         {
-            Destroy(gameObject);
+            deathSound.Play();
+            transform.rotation = Quaternion.Euler(0, 0, 90f * (defaultFacing ? -1 : 1));
+            GetComponent<Animator>().enabled = false;
+            isDead = true;
+            rb.gravityScale = 0;
         }
     }
 

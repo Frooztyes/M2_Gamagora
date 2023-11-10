@@ -37,7 +37,7 @@ public class Dijkstra : Graph
             Q.Add(i);
         }
 
-        dist[GetIndex(from)] = 0;
+        dist[from.Index] = 0;
 
         while (Q.Count > 0)
         {
@@ -47,9 +47,9 @@ public class Dijkstra : Graph
                 break;
             }
             Q.Remove(u);
-            foreach (Node v in Nodes.ElementAt(u).Value.GetNeighboors())
+            foreach (Node v in NodesIndex[u].GetNeighboors())
             {
-                int v2 = GetIndex(GetNodeByPosition(v.Position));
+                int v2 = GetNodeByPosition(v.Position).Index;
                 if (Q.Contains(v2))
                 {
                     float alt = dist[u] + Nodes.ElementAt(v2).Value.GetLengthTo(Nodes.ElementAt(u).Value);
@@ -64,8 +64,8 @@ public class Dijkstra : Graph
         }
 
 
-        int sdeb = GetIndex(from);
-        int sfin = GetIndex(to);
+        int sdeb = from.Index;
+        int sfin = to.Index;
         int s = sfin;
         List<Node> suite = new List<Node>();
         while (s != sdeb && s != -1)

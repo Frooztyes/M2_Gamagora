@@ -5,11 +5,14 @@ using UnityEngine;
 
 public class Graph
 {
+    int index = 0;
     public Dictionary<Vector2, Node> Nodes { get; set; }
+    public Dictionary<int, Node> NodesIndex { get; set; }
 
     protected Graph()
     {
         Nodes = new Dictionary<Vector2, Node>();
+        NodesIndex = new Dictionary<int, Node>();
     }
 
     public void RemoveNode(Node n)
@@ -41,8 +44,9 @@ public class Graph
     {
         if (GetNodeByPosition(pos) != null) return GetNodeByPosition(pos);
 
-        Node n = new Node(pos);
+        Node n = new Node(pos, Nodes.Count);
         Nodes.Add(pos, n);
+        NodesIndex.Add(n.Index, n);
         return n;
     }
 
@@ -55,7 +59,7 @@ public class Graph
 
     public int GetIndex(Node n)
     {
-        return Nodes.Values.ToList().IndexOf(n);
+        return n.Index;
     }
 
     public override string ToString() 

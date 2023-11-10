@@ -93,36 +93,6 @@ public class ChunkGenerator : MonoBehaviour
         return (int) (player.position.y / (chunk.Bottom - chunk.Top)) - 2;
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        return;
-        if(chunk == null) chunk = new Chunk(chunkTemplate);
-        Vector3Int startPoint = Vector3Int.FloorToInt(transform.position - chunk.Left * Vector3.right - chunk.Top * Vector3.up);
-        for (int x = 0; x < chunk.Width; x++)
-        {
-            for (int y = 0; y < chunk.Height; y++)
-            {
-                TileBase tile = chunk.allTiles[x + y * chunk.Width];
-                Gizmos.color = Color.grey;
-                if (tile != null)
-                {
-                    Gizmos.DrawCube(startPoint + new Vector3(x + 0.5f, y + 0.5f, 0), Vector3.one);
-                }
-
-            }
-        }
-
-        //int randomLadderX = Random.Range(chunk.InnerLeft, chunk.InnerRight);
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawCube(startPoint + new Vector3(randomLadderX + 0.5f, chunk.InnerTop + 0.5f, 0), Vector3.one);
-
-        //Debug.Log(chunk.InnerWidth);
-        //Debug.Log(chunk.InnerHeight);
-
-    }
-#endif
-
     private GameObject CreateGraphNode(Vector3 position, GameObject astarHandler = null)
     {
         GameObject g = Instantiate(graphNode, position + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);

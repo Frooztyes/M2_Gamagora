@@ -217,14 +217,15 @@ public sealed class DijkstraConstructor
         GameObject[] ennemiesGo = GameObject.FindGameObjectsWithTag("Ennemy");
         List<Node> ennemiesNode = new List<Node>();
 
-        foreach (GameObject ennemy in ennemiesGo)
+        foreach (GameObject enemy in ennemiesGo)
         {
-            Vector2 positionEnnemy = ennemy.transform.position;
+            EnnemyController ec = enemy.GetComponent<EnnemyController>();
+            if (ec.IsDead) continue;
+            Vector2 positionEnnemy = enemy.transform.position;
 
             // résolution du problème d'ancrage
-            positionEnnemy.y += ennemy.GetComponent<SpriteRenderer>().bounds.size.y / 2;
+            positionEnnemy.y += enemy.GetComponent<SpriteRenderer>().bounds.size.y / 2;
 
-            EnnemyController ec = ennemy.GetComponent<EnnemyController>();
             // améliorer le calcul
             if (elements.TryGetValue(Vector2Int.FloorToInt(positionEnnemy) + offset, out Node n))
             {
@@ -270,7 +271,6 @@ public sealed class DijkstraConstructor
         Node fromNode = DijkstraGraph.GetNodeByPosition(from);
         Node toNode = DijkstraGraph.GetNodeByPosition(to);
         if (fromNode == null || toNode == null) return false;
-
         List<Node> localPath = DijkstraGraph.GetPath(fromNode, toNode);
         List<Node> lastPath = ennemyController.lastPath;
         Vector2 gotoPosition;

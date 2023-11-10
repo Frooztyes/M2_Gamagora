@@ -18,7 +18,7 @@ public class MenuHandler : MonoBehaviour
     public void ButtonQuit()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #endif
         Application.Quit();
     }

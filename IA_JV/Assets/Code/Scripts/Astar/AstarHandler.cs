@@ -40,9 +40,10 @@ public class AstarHandler : MonoBehaviour
         if (end == null)
             return;
 
-        if (Bird.gameObject == null)
+        if (Bird == null || Bird.gameObject == null)
         {
             visuals.ResetAstarVisuals();
+            return;
         }
 
         if (AstarConstructor.CalculateNextWaypoint(Bird, end, out Vector2 dir))

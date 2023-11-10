@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -11,6 +10,8 @@ public class BirdController : MonoBehaviour
     public List<Node> lastPath;
 
     [SerializeField] private float MoveSpeed = 1f;
+    [SerializeField] private AudioSource DeathSound;
+    [SerializeField] private AudioSource SqueakSound;
 
     private Vector3 dir;
     bool canMove;
@@ -38,6 +39,7 @@ public class BirdController : MonoBehaviour
         dir = Vector2.zero;
         canMove = false;
         defaultFacing = false;
+        isDead = false;
         animator = GetComponent<Animator>();
     }
 
@@ -46,9 +48,19 @@ public class BirdController : MonoBehaviour
         canMove = false;
     }
 
+    private bool isDead = false;
+
     // Update is called once per frame
     void FixedUpdate()
     {
+        if(isDead)
+        {
+            if(!DeathSound.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            return;
+        }
         Vector2 toDir = transform.position - dir;
         if (canMove)
         {
@@ -71,6 +83,9 @@ public class BirdController : MonoBehaviour
 
     public void Kill()
     {
-        Destroy(gameObject);
+        Destroy(GetComponent<SpriteRenderer>());
+        DeathSound.pitch = Random.Range(0.8f, 1.2f);
+        DeathSound.Play();
+        isDead = true;
     }
 }

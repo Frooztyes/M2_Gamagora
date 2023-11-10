@@ -8,6 +8,9 @@ public class EnnemyController : MonoBehaviour
     public Vector2? PositionInGraph;
     public List<Node> lastPath;
 
+    [SerializeField] private AudioSource DeathSound;
+    [SerializeField] private AudioSource HitSound;
+
     [SerializeField] private float MoveSpeed = 1f;
     [SerializeField] private int HealthPoints = 2;
     private int CurrentHeath;
@@ -31,7 +34,8 @@ public class EnnemyController : MonoBehaviour
 
     Rigidbody2D rb;
     AudioSource walkEffect;
-    bool canMove;
+    private bool canMove;
+    public bool IsDead { get; set; }
 
     public void Stop()
     {
@@ -51,12 +55,21 @@ public class EnnemyController : MonoBehaviour
         walkEffect = GetComponent<AudioSource>();
         CurrentHeath = HealthPoints;
         isInvicible = false;
+        IsDead = false;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(canMove)
+        if (IsDead)
+        {
+            if (!DeathSound.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            return;
+        }
+        if (canMove)
         {
             Vector3 oldPosition = transform.position;
             transform.position = Vector3.MoveTowards(transform.position, dir, MoveSpeed * Time.fixedDeltaTime);
@@ -69,8 +82,8 @@ public class EnnemyController : MonoBehaviour
 
             if (dir.y != 0)
             {
-                if (transform.position.x > player.position.x && defaultFacing) FlipCharacter();
-                else if (transform.position.x < player.position.x && !defaultFacing) FlipCharacter();
+                if (player != null && transform.position.x > player.position.x && defaultFacing) FlipCharacter();
+                else if (player != null && transform.position.x < player.position.x && !defaultFacing) FlipCharacter();
             }
             else
             {
@@ -82,10 +95,6 @@ public class EnnemyController : MonoBehaviour
 
     private bool isInvicible;
 
-    private void Die()
-    {
-        Destroy(gameObject);
-    }
 
     private void RemoveInvincibility()
     {
@@ -94,12 +103,20 @@ public class EnnemyController : MonoBehaviour
 
     public void TakeDamage()
     {
-        if (isInvicible) return;
+        if (isInvicible || IsDead) return;
         isInvicible = true;
         CurrentHeath--;
         if(CurrentHeath <= 0)
         {
-            Die();
+            DeathSound.pitch = Random.Range(0.8f, 1.2f);
+            DeathSound.Play();
+            Destroy(GetComponent<SpriteRenderer>());
+            IsDead = true;
+        } 
+        else
+        {
+            HitSound.pitch = Random.Range(0.8f, 1.2f);
+            HitSound.Play();
         }
         Invoke(nameof(RemoveInvincibility), 0.5f);
     }

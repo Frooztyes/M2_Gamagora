@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Node
 {
+    public int Index { get; }
     public Vector2 Position { get; }
 
     public Dictionary<Node, float> Neighbors { get; }
@@ -19,11 +20,19 @@ public class Node
         End
     }
 
+    public Node(Vector2 pos, int index)
+    {
+        Neighbors = new Dictionary<Node, float>();
+        Position = pos;
+        Status = State.Present;
+        Index = index;
+    }
     public Node(Vector2 pos)
     {
         Neighbors = new Dictionary<Node, float>();
         Position = pos;
         Status = State.Present;
+        Index = -1;
     }
 
     public void AddNeighbor(Node n, float cost)
