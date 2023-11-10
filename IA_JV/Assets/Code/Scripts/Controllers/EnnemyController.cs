@@ -13,6 +13,7 @@ public class EnnemyController : MonoBehaviour
 
     [SerializeField] private float MoveSpeed = 1f;
     [SerializeField] private int HealthPoints = 2;
+    [SerializeField] private GameObject deathAnim;
     private int CurrentHeath;
     private float moveSpeedInternal;
     private Vector3 dir;
@@ -93,6 +94,8 @@ public class EnnemyController : MonoBehaviour
         }
     }
 
+    private ParticleSystem part;
+
     private bool isInvicible;
 
 
@@ -108,6 +111,7 @@ public class EnnemyController : MonoBehaviour
         CurrentHeath--;
         if(CurrentHeath <= 0)
         {
+            part = Instantiate(deathAnim, transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
             DeathSound.pitch = Random.Range(0.8f, 1.2f);
             DeathSound.Play();
             Destroy(GetComponent<SpriteRenderer>());
