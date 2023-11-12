@@ -17,7 +17,7 @@ public class EnnemyController : MonoBehaviour
     private int CurrentHeath;
     private float moveSpeedInternal;
     private Vector3 dir;
-    private Transform player;
+    private CharacterController player;
     private bool defaultFacing;
     public Vector2 WaypointToGo
     {
@@ -47,7 +47,7 @@ public class EnnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterController>();
         moveSpeedInternal = MoveSpeed;
         rb = GetComponent<Rigidbody2D>();
         dir = Vector2.zero;
@@ -62,6 +62,7 @@ public class EnnemyController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (player.IsDead) return;
         if (IsDead)
         {
             if (!DeathSound.isPlaying)
@@ -83,8 +84,8 @@ public class EnnemyController : MonoBehaviour
 
             if (dir.y != 0)
             {
-                if (player != null && transform.position.x > player.position.x && defaultFacing) FlipCharacter();
-                else if (player != null && transform.position.x < player.position.x && !defaultFacing) FlipCharacter();
+                if (player != null && transform.position.x > player.transform.position.x && defaultFacing) FlipCharacter();
+                else if (player != null && transform.position.x < player.transform.position.x && !defaultFacing) FlipCharacter();
             }
             else
             {

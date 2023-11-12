@@ -6,7 +6,7 @@ public class SpawnEnnemy : MonoBehaviour
 {
     [SerializeField] private GameObject ennemy;
 
-    [HideInInspector] public Vector3 EnnemySpawnPoint;
+    public Vector3 EnnemySpawnPoint;
     public Transform parent;
     private bool hasSpawned = false;
     

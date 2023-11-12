@@ -2,18 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuHandler : MonoBehaviour
 {
-    [SerializeField] private GameObject MenuHUD;
-    [SerializeField] private GameObject HUD;
+    [SerializeField] private string gameScene;
     [SerializeField] private GenerateClouds cloudGenerator;
-
-
-    private void Start()
-    {
-        MenuHUD.SetActive(true);
-    }
 
     public void ButtonQuit()
     {
@@ -25,9 +19,6 @@ public class MenuHandler : MonoBehaviour
 
     public void ButtonStart()
     {
-        Camera.main.GetComponent<CameraFollow>().enabled = true;
-        cloudGenerator.Stop();
-        MenuHUD.SetActive(false);
-        HUD.SetActive(true);
+        SceneManager.LoadScene(gameScene, LoadSceneMode.Single);
     }
 }

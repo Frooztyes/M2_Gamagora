@@ -26,7 +26,9 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private float attackRange;
     [SerializeField] private LayerMask ennemyLayer;
 
-    private int nbJewels;
+    public int NbJewels { get; set; }
+    public int NbEnnemies { get; set; }
+
     private TextMeshProUGUI hudJewels;
 
 
@@ -38,21 +40,21 @@ public class CharacterController : MonoBehaviour
         Physics.gravity *= 40;
         isAttacking = false;
         defaultFacing = false; 
-        nbJewels = 0;
-        isDead = false;
+        NbJewels = 0;
+        IsDead = false;
     }
 
     private bool isGrounded;
     private bool isAttacking;
-    private bool isDead;
+    public bool IsDead { get; set; }
 
     void Attack()
     {
+        isAttacking = true;
         swordSwoosh.pitch = Random.Range(0.8f, 1.2f);
         swordSwoosh.Play();
         animator.SetTrigger("IsAttacking");
         Collider2D[] hits =  Physics2D.OverlapCircleAll(attackPoint.position, attackRange, ennemyLayer);
-        Debug.Log(hits.Length);
         foreach(Collider2D collider in hits)
         {
             int layer = collider.gameObject.layer;
@@ -62,6 +64,7 @@ public class CharacterController : MonoBehaviour
                 BirdController contr = collider.GetComponent<BirdController>();
 
                 contr.Kill();
+                NbEnnemies++;
 
             }
             else if (layer == LayerMask.NameToLayer("Skeleton"))
@@ -69,12 +72,8 @@ public class CharacterController : MonoBehaviour
                 EnnemyController contr = collider.GetComponent<EnnemyController>();
 
                 contr.TakeDamage();
+                if (contr.IsDead) NbEnnemies++;
             }
-
-
-
-
-
         }
     }
 
@@ -85,7 +84,8 @@ public class CharacterController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !isDead)
+        if(isAttacking && !swordSwoosh.isPlaying) isAttacking = false;
+        if (Input.GetMouseButtonDown(0) && !IsDead && !isAttacking)
         {
             Attack();
         }
@@ -94,7 +94,7 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (isDead) return;
+        if (IsDead) return;
         CheckGrounded();
 
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -156,20 +156,21 @@ public class CharacterController : MonoBehaviour
         }
         if (layer == "Jewel")
         {
+            Destroy(collision.gameObject.GetComponent<BoxCollider2D>());
             if (hudJewels == null)
             {
                 hudJewels = GameObject.FindGameObjectWithTag("HUD_Jewels").GetComponent<TextMeshProUGUI>();
             }
-            nbJewels++;
-            hudJewels.text = nbJewels.ToString();
+            NbJewels++;
+            hudJewels.text = NbJewels.ToString();
             Destroy(collision.gameObject);
         }
-        if((layer == "Bird" || layer == "Skeleton") && !isDead)
+        if((layer == "Bird" || layer == "Skeleton") && !IsDead)
         {
             deathSound.Play();
             transform.rotation = Quaternion.Euler(0, 0, 90f * (defaultFacing ? -1 : 1));
-            GetComponent<Animator>().enabled = false;
-            isDead = true;
+            IsDead = true;
+            animator.SetBool("IsDead", true);
             rb.gravityScale = 0;
         }
     }

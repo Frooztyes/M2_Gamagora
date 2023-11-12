@@ -86,7 +86,7 @@ public class ChunkGenerator : MonoBehaviour
         }
     }
 
-    private int GetPlayerChunk()
+    public int GetPlayerChunk()
     {
         if (player == null) return 0;
         if (chunk == null) return 0;
@@ -270,12 +270,12 @@ public class ChunkGenerator : MonoBehaviour
         if (laddersPosition.Contains(chunk.InnerRight))
         {
             platformPosition = chunk.InnerLeft;
-            idPlatform = 0;
+            idPlatform = 1;
         }
         else if (laddersPosition.Contains(chunk.InnerLeft))
         {
             platformPosition = chunk.InnerRight;
-            idPlatform = 1;
+            idPlatform = 0;
         }
         else if (Random.value < 0.5)
         {

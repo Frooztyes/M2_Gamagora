@@ -18,6 +18,7 @@ public class BirdController : MonoBehaviour
     Rigidbody2D rb;
     private bool defaultFacing;
     private Animator animator;
+    private CharacterController player;
 
     public Vector2 WaypointToGo
     {
@@ -35,6 +36,7 @@ public class BirdController : MonoBehaviour
 
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody2D>();
         dir = Vector2.zero;
         canMove = false;
@@ -53,6 +55,7 @@ public class BirdController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (player.IsDead) return;
         if(isDead)
         {
             if(!DeathSound.isPlaying)
