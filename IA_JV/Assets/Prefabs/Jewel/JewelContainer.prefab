@@ -93,6 +93,7 @@ GameObject:
   - component: {fileID: 3377383745260329193}
   - component: {fileID: 712017724765637344}
   - component: {fileID: 223288237735265226}
+  - component: {fileID: -7420112602720358618}
   m_Layer: 7
   m_Name: JewelContainer
   m_TagString: Untagged
@@ -257,6 +258,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-7420112602720358618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2850992221549606774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06809df16e78da6478345614edc99f33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7442295415933576615
 GameObject:
   m_ObjectHideFlags: 0

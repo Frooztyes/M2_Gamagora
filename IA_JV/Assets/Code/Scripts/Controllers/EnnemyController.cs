@@ -71,6 +71,12 @@ public class EnnemyController : MonoBehaviour
             }
             return;
         }
+
+        if (Vector3.Distance(transform.position, player.transform.position) > 20)
+        {
+            Destroy(gameObject);
+        }
+
         if (canMove)
         {
             Vector3 oldPosition = transform.position;
@@ -99,6 +105,17 @@ public class EnnemyController : MonoBehaviour
 
     private bool isInvicible;
 
+    void Unblink()
+    {
+        GetComponent<SpriteRenderer>().color = Color.white;
+    }
+
+    void Blink()
+    {
+        GetComponent<SpriteRenderer>().color = Color.red;
+        Invoke(nameof(Unblink), 0.2f);
+    }
+
 
     private void RemoveInvincibility()
     {
@@ -120,6 +137,7 @@ public class EnnemyController : MonoBehaviour
         } 
         else
         {
+            Blink();
             HitSound.pitch = Random.Range(0.8f, 1.2f);
             HitSound.Play();
         }

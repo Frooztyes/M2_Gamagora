@@ -156,11 +156,15 @@ public class CharacterController : MonoBehaviour
         }
         if (layer == "Jewel")
         {
-            Destroy(collision.gameObject.GetComponent<BoxCollider2D>());
             if (hudJewels == null)
             {
                 hudJewels = GameObject.FindGameObjectWithTag("HUD_Jewels").GetComponent<TextMeshProUGUI>();
             }
+            JewelHandler jewelHandler = collision.gameObject.GetComponent<JewelHandler>();
+            if (jewelHandler.Taken) return;
+
+            jewelHandler.Taken = true;
+
             NbJewels++;
             hudJewels.text = NbJewels.ToString();
             Destroy(collision.gameObject);

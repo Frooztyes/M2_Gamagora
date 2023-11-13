@@ -47,6 +47,11 @@ public sealed class DijkstraConstructor
 
     public void UpdateVisuals()
     {
+        if (visualHandlers == null)
+        {
+            visualHandlers = GameObject.FindGameObjectWithTag("VisualHandlers").GetComponent<VisualHandlers>();
+            return;
+        }
         visualHandlers.RemoveDijkstraNodes();
         foreach (var n in DijkstraGraph.Nodes)
         {

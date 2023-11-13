@@ -151,19 +151,6 @@ public class ChunkGenerator : MonoBehaviour
             Destroy(go);
             astarNodes.Remove(position);
         }
-
-        //if (astarNodes.TryGetValue(position + Vector3.up, out GameObject go))
-        //    Destroy(go);
-
-        //if (astarNodes.TryGetValue(position + Vector3.down, out go))
-        //    Destroy(go);
-
-        //if (astarNodes.TryGetValue(position + Vector3.right, out go))
-        //    Destroy(go);
-
-        //if (astarNodes.TryGetValue(position + Vector3.left, out go))
-        //    Destroy(go);
-
     }
 
     private List<GameObject> GenerateLights(int nbLights, List<int> laddersPosition, Dictionary<Vector3Int, TileBase> tilesBg, Dictionary<Vector3, GameObject> astarNodes)
@@ -199,18 +186,20 @@ public class ChunkGenerator : MonoBehaviour
 
     void GenerateSpawner(float ladderPosition)
     {
-        Vector3 spawnPoint;
-        if(Random.value < 0.5)
+        int spawnPoint;
+        float mid = (chunk.InnerRight + chunk.InnerLeft) / 2;
+        if (ladderPosition < mid)
         {
-            spawnPoint = startPoint + new Vector3(chunk.InnerLeft, chunk.InnerTop);
-        } 
+            spawnPoint = chunk.InnerRight;
+        }
         else
         {
-            spawnPoint = startPoint + new Vector3(chunk.InnerRight, chunk.InnerTop);
+            spawnPoint = chunk.InnerLeft;
         }
+
         Vector3 spawnTriggerPosition = startPoint + new Vector3(ladderPosition, chunk.InnerTop);
         SpawnEnnemy s = Instantiate(spawnerTrigger, spawnTriggerPosition, Quaternion.identity).GetComponent<SpawnEnnemy>();
-        s.EnnemySpawnPoint = spawnPoint;
+        s.EnnemySpawnPoint = startPoint + new Vector3(spawnPoint, chunk.InnerTop);
         s.parent = skeletonsContainer;
         s.transform.SetParent(spawnersContainer);
         s.transform.position = spawnTriggerPosition;
@@ -266,33 +255,28 @@ public class ChunkGenerator : MonoBehaviour
             }
         }
 
-        int idPlatform;
         if (laddersPosition.Contains(chunk.InnerRight))
         {
             platformPosition = chunk.InnerLeft;
-            idPlatform = 1;
         }
         else if (laddersPosition.Contains(chunk.InnerLeft))
         {
             platformPosition = chunk.InnerRight;
-            idPlatform = 0;
         }
         else if (Random.value < 0.5)
         {
-
             platformPosition = chunk.InnerRight;
-            idPlatform = 1;
         }
         else
         {
-            platformPosition = chunk.InnerLeft;
-            idPlatform = 0;
+            platformPosition = chunk.InnerLeft ;
         }
 
         int y = chunk.InnerBottom - 1;
-        background.SetTile(startPoint + new Vector3Int(platformPosition, y, 0), platformsTile[idPlatform]);
+        TileBase platform = platformsTile[platformPosition == chunk.InnerLeft ? 0 : 1];
+        background.SetTile(startPoint + new Vector3Int(platformPosition, y, 0), platform);
         tilesBg.Remove(startPoint + new Vector3Int(platformPosition, y, 0));
-        tilesBg.Add(startPoint + new Vector3Int(platformPosition, y, 0), platformsTile[idPlatform]);
+        tilesBg.Add(startPoint + new Vector3Int(platformPosition, y, 0), platform);
         return platformPosition;
     }
 

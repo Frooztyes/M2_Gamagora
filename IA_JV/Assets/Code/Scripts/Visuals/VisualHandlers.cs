@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -22,6 +23,8 @@ public class VisualHandlers : MonoBehaviour
 
     public void RemoveDijkstraNodes()
     {
+        if(dijkstraVisuals == null)
+            dijkstraVisuals = transform.Find("Dijkstra");
         foreach (Transform child in dijkstraVisuals)
         {
             Destroy(child.gameObject);
@@ -151,15 +154,14 @@ public class VisualHandlers : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.P))
+        if(Input.GetKeyDown(KeyCode.E))
         {
             dijkstraVisuals.gameObject.SetActive(!dijkstraVisuals.gameObject.activeSelf);
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             astarVisuals.gameObject.SetActive(!astarVisuals.gameObject.activeSelf);
         }
     }
-
 }
