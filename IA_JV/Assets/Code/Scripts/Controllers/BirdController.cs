@@ -84,11 +84,16 @@ public class BirdController : MonoBehaviour
         transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
     }
 
-    public void Kill()
+    public int Kill()
     {
         Destroy(GetComponent<SpriteRenderer>());
         DeathSound.pitch = Random.Range(0.8f, 1.2f);
         DeathSound.Play();
-        isDead = true;
+        if(!isDead)
+        {
+            isDead = true;
+            return 1;
+        }
+        return 0;
     }
 }

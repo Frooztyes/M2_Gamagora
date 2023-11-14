@@ -63,16 +63,14 @@ public class CharacterController : MonoBehaviour
             {
                 BirdController contr = collider.GetComponent<BirdController>();
 
-                contr.Kill();
-                NbEnnemies++;
-
+                NbEnnemies += contr.Kill();
             }
             else if (layer == LayerMask.NameToLayer("Skeleton"))
             {
                 EnnemyController contr = collider.GetComponent<EnnemyController>();
 
-                contr.TakeDamage();
-                if (contr.IsDead) NbEnnemies++;
+
+                NbEnnemies += contr.TakeDamage();
             }
         }
     }

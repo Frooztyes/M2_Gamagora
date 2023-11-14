@@ -122,9 +122,9 @@ public class EnnemyController : MonoBehaviour
         isInvicible = false;
     }
 
-    public void TakeDamage()
+    public int TakeDamage()
     {
-        if (isInvicible || IsDead) return;
+        if (isInvicible || IsDead) return 0;
         isInvicible = true;
         CurrentHeath--;
         if(CurrentHeath <= 0)
@@ -133,7 +133,11 @@ public class EnnemyController : MonoBehaviour
             DeathSound.pitch = Random.Range(0.8f, 1.2f);
             DeathSound.Play();
             Destroy(GetComponent<SpriteRenderer>());
-            IsDead = true;
+            if(!IsDead)
+            {
+                IsDead = true;
+                return 1;
+            }
         } 
         else
         {
@@ -142,6 +146,7 @@ public class EnnemyController : MonoBehaviour
             HitSound.Play();
         }
         Invoke(nameof(RemoveInvincibility), 0.5f);
+        return 0;
     }
 
     void FlipCharacter()
