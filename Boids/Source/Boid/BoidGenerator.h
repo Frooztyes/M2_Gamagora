@@ -23,6 +23,7 @@ public:
 
 	bool isLaunched = false;
 	FVector launchPosition;
+	UStaticMesh* boidMesh;
 
 	UFUNCTION(BlueprintCallable)
 	void Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer);
@@ -30,8 +31,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Launch(FVector position);
 
+	UFUNCTION(BlueprintCallable)
+	void AddBoid();
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* VisualMesh;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
 	int NumBoids = 2;
@@ -72,7 +77,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void GenerateBoids(UStaticMesh* myMesh);
+	void GenerateBoids();
 	bool IsInSphere(FVector center, FVector point, float radius);
 	FVector MoveCloser(ABoids* currentBoid);
 	FVector MoveWith(ABoids* currentBoid);

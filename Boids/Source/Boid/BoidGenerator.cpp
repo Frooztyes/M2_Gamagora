@@ -45,40 +45,44 @@ void ABoidGenerator::Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* st
 	this->mat = matLoc;
 	this->NumBoids = numBoids;
 	this->offset = offsetPlayer;
-	GenerateBoids(staticMesh);
+	this->boidMesh = staticMesh;
+	GenerateBoids();
 }
 
-void ABoidGenerator::GenerateBoids(UStaticMesh* myMesh) {
+void ABoidGenerator::AddBoid() {
 	FRotator SpawnRotation(90, 0, 0);
 
+	using namespace std::chrono;
+	milliseconds ms = duration_cast<milliseconds>(
+		system_clock::now().time_since_epoch()
+	);
+	FMath::SRandInit(ms.count());
+	FMath::RandInit(ms.count() + boids.Num() * ms.count());
+
+	FVector SpawnLocation(
+		FMath::RandRange(-radiusBorder, radiusBorder),
+		FMath::RandRange(-radiusBorder, radiusBorder),
+		FMath::RandRange(-radiusBorder, radiusBorder)
+	);
+
+	ABoids* boid = GetWorld()->SpawnActor<ABoids>(GetActorLocation() + SpawnLocation, SpawnRotation);
+	boid->Initialize(mat, boidMesh, true, false);
+	//boid->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	//boid->SetActorLocation(GetActorLocation() + SpawnLocation);
+
+	boids.Add(boid);
+}
+
+void ABoidGenerator::GenerateBoids() {
 	for (int i = 0; i < NumBoids; i++)
 	{
-		using namespace std::chrono;
-		milliseconds ms = duration_cast<milliseconds>(
-			system_clock::now().time_since_epoch()
-		);
-		FMath::SRandInit(ms.count());
-		FMath::RandInit(ms.count() + i * ms.count());
-
-		FVector SpawnLocation(
-			FMath::RandRange(-radiusBorder, radiusBorder),
-			FMath::RandRange(-radiusBorder, radiusBorder),
-			FMath::RandRange(-radiusBorder, radiusBorder)
-		);
-
-		ABoids* boid = GetWorld()->SpawnActor<ABoids>(GetActorLocation() + SpawnLocation, SpawnRotation);
-		boid->Initialize(mat, myMesh, true, false);
-		//boid->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		//boid->SetActorLocation(GetActorLocation() + SpawnLocation);
-
-		boids.Add(boid);
+		AddBoid();
 	}
 }
 
 void ABoidGenerator::Launch(FVector position) {
 	this->launchPosition = position;
 	this->isLaunched = true;
-
 }
 
 FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {
