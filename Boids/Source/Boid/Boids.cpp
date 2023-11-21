@@ -29,13 +29,13 @@ ABoids::ABoids()
 	}
 
 	Velocity = FVector(0, 0, 0);
-	Collider = NewObject<UBoxComponent>(this, FName("BoxCollider"));
+	/*Collider = NewObject<UBoxComponent>(this, FName("BoxCollider"));
 	Collider->SetBoxExtent(VisualMesh->Bounds.BoxExtent);
 	Collider->bDynamicObstacle = true;
 	Collider->AttachToComponent(VisualMesh, FAttachmentTransformRules::KeepRelativeTransform);
 	Collider->SetWorldLocation(GetActorLocation() + FVector(0, 0, VisualMesh->Bounds.BoxExtent.Z));
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ABoids::OnOverlapBegin);
-	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);
+	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);*/
 }
 
 void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle) {
@@ -84,13 +84,8 @@ void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep, 
 	const FHitResult& SweepResult) 
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, OtherActor->GetClass());
 	if (Cast<ABP_GroundClass>(OtherActor)) {
 		Destroy();
-	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, "---------------");
-	if (OverlappedComp->ComponentHasTag("Ground")) {
 	}
 }
 
