@@ -56,9 +56,9 @@ void ABoids::BeginPlay()
 		system_clock::now().time_since_epoch()
 	);
 	FMath::RandInit(ms.count());
-	Velocity.X = FMath::RandRange(1, 10) / 10.0;
-	Velocity.Y = FMath::RandRange(1, 10) / 10.0;
-	Velocity.Z = FMath::RandRange(1, 10) / 10.0;
+	Velocity.X = FMath::SRand();
+	Velocity.Y = FMath::SRand();
+	Velocity.Z = FMath::SRand();
 
 	FVector origin;
 	FVector boxExtent;

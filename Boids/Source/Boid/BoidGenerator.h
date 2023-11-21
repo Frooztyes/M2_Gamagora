@@ -26,7 +26,12 @@ public:
 	UStaticMesh* boidMesh;
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer);
+	void Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, 
+		float moveCloserS = 1000,
+		float distanceToNeigh = 0.35f, 
+		float catchupVelocity = 10,
+		float attractionForce = 10, 
+		float _vLim = 50);
 
 	UFUNCTION(BlueprintCallable)
 	void Launch(FVector position);
@@ -60,6 +65,9 @@ public:
 	float radiusBorder = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
+	float vLim = 50.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
 	bool tendToPosition = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
@@ -88,7 +96,7 @@ protected:
 	FVector TendToPlace(ABoids* currentBoid);
 	FVector BoundPosition(ABoids* currentBoid);
 	void LimitVelocity(ABoids* currentBoid);
-	void MoveBoids();
+	void MoveBoids(float DeltaTime);
 
 public:
 	// Called every frame

@@ -41,11 +41,27 @@ void ABoidGenerator::BeginPlay()
 	player = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
-void ABoidGenerator::Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer) {
+void ABoidGenerator::Initialize(
+	UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, 
+	float moveCloserS, 
+	float distanceToNeigh, 
+	float catchupVelocity,
+	float attractionForce,
+	float _vLim)
+{
 	this->mat = matLoc;
 	this->NumBoids = numBoids;
 	this->offset = offsetPlayer;
 	this->boidMesh = staticMesh;
+
+	moveCloserStrength = moveCloserS;
+	moveAwayDistance = distanceToNeigh;
+	moveWithStrength = catchupVelocity;
+	tendToPlaceStrength = attractionForce;
+	boundToPosition = false;
+
+	vLim = _vLim;
+
 	GenerateBoids();
 }
 
@@ -83,6 +99,7 @@ void ABoidGenerator::GenerateBoids() {
 void ABoidGenerator::Launch(FVector position) {
 	this->launchPosition = position;
 	this->isLaunched = true;
+	vLim = vLim * 3;
 }
 
 FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {
@@ -117,7 +134,7 @@ FVector ABoidGenerator::MoveAway(ABoids* currentBoid) {
 	for (auto* b : boids) {
 		FVector bPosition = b->GetActorLocation();
 		if (currentBoid->GetActorLocation() != b->GetActorLocation()) {
-			if (FVector::Dist(bPosition, bjPosition) < moveAwayDistance) {
+			if ((bPosition - bjPosition).Length() < moveAwayDistance) {
 				c -= (bPosition - bjPosition);
 			}
 		}
@@ -171,33 +188,36 @@ FVector ABoidGenerator::BoundPosition(ABoids* currentBoid) {
 }
 
 void ABoidGenerator::LimitVelocity(ABoids * currentBoid) {
-	float vLim = 10;
 	if (currentBoid->Velocity.Length() > vLim) {
 		currentBoid->Velocity = (currentBoid->Velocity / currentBoid->Velocity.Length()) * vLim;
 	}
 }
 
-void ABoidGenerator::MoveBoids() {
+void ABoidGenerator::MoveBoids(float DeltaTime) {
 	for (auto* boid : boids) {
 		if (!boid) {
 			boids.Remove(boid);
 			continue;
 		}
-		boid->Velocity += MoveWith(boid);
-		boid->Velocity += MoveCloser(boid);
-		boid->Velocity += MoveAway(boid);
-		if(boundToPosition)
-			boid->Velocity += BoundPosition(boid);
+
+		boid->Velocity += MoveWith(boid); // rule 1
+		boid->Velocity += MoveAway(boid); // rule 2
+		boid->Velocity += MoveCloser(boid); // rule 3
+
+		//if(boundToPosition)
+		//	boid->Velocity += BoundPosition(boid);
 		if(tendToPosition)
 			boid->Velocity += TendToPlace(boid);
+
 		if(limitVelocity)
 			LimitVelocity(boid);
-		if (isLaunched) {
+
+		/*if (isLaunched) {
 			boid->Velocity *= acceleration;
 			acceleration += 0.05f;
-		}
+		}*/
 
-		boid->SetActorLocation(boid->GetActorLocation() + boid->Velocity);
+		boid->SetActorLocation(boid->GetActorLocation() + boid->Velocity * DeltaTime * 30);
 	}
 }
 
@@ -209,7 +229,7 @@ int ABoidGenerator::GetBoidsNumber() {
 void ABoidGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveBoids();
+	MoveBoids(DeltaTime);
 	if (isLaunched) {
 		//SetActorLocation(FMath::Lerp(GetActorLocation(), launchPosition, DeltaTime));
 		SetActorLocation(launchPosition);
