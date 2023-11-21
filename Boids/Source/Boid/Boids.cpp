@@ -4,6 +4,7 @@
 #include "Boids.h"
 #include <chrono>
 #include <Components/SphereComponent.h>
+#include "BP_GroundClass.h"
 
 // Sets default values
 ABoids::ABoids()
@@ -28,14 +29,13 @@ ABoids::ABoids()
 	}
 
 	Velocity = FVector(0, 0, 0);
-
-	FVector origin;
-	FVector boxExtent;
-	GetActorBounds(false, origin, boxExtent);
-
-	USphereComponent* collider = CreateDefaultSubobject<USphereComponent>(TEXT("Attacking Cullusion"));
-	collider->InitSphereRadius(boxExtent.X);
-	AddInstanceComponent(collider);
+	Collider = NewObject<UBoxComponent>(this, FName("BoxCollider"));
+	Collider->SetBoxExtent(VisualMesh->Bounds.BoxExtent);
+	Collider->bDynamicObstacle = true;
+	Collider->AttachToComponent(VisualMesh, FAttachmentTransformRules::KeepRelativeTransform);
+	Collider->SetWorldLocation(GetActorLocation() + FVector(0, 0, VisualMesh->Bounds.BoxExtent.Z));
+	Collider->OnComponentBeginOverlap.AddDynamic(this, &ABoids::OnOverlapBegin);
+	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);
 }
 
 void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle) {
@@ -59,6 +59,11 @@ void ABoids::BeginPlay()
 	Velocity.X = FMath::RandRange(1, 10) / 10.0;
 	Velocity.Y = FMath::RandRange(1, 10) / 10.0;
 	Velocity.Z = FMath::RandRange(1, 10) / 10.0;
+
+	FVector origin;
+	FVector boxExtent;
+	GetActorBounds(false, origin, boxExtent);
+	Collider->SetBoxExtent(boxExtent);
 }
 
 void ABoids::RotateToCamera() {
@@ -70,6 +75,31 @@ void ABoids::RotateToCamera() {
 	FRotator rotToCam = dir.Rotation();
 	rotToCam.Pitch += 90;
 	SetActorRotation(rotToCam);
+}
+
+void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
+	class AActor* OtherActor, 
+	class UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, 
+	bool bFromSweep, 
+	const FHitResult& SweepResult) 
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, OtherActor->GetClass());
+	if (Cast<ABP_GroundClass>(OtherActor)) {
+		Destroy();
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, "---------------");
+	if (OverlappedComp->ComponentHasTag("Ground")) {
+	}
+}
+
+void ABoids::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, 
+	class AActor* OtherActor, 
+	class UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex) {
+
+
 }
 
 // Called every frame

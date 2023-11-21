@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddBoid();
 
+	UFUNCTION(BlueprintCallable)
+	int GetBoidsNumber();
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* VisualMesh;
 

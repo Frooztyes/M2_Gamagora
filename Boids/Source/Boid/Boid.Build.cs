@@ -8,6 +8,12 @@ public class Boid : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-	}
+        PrivatePCHHeaderFile = "BoidsPrecompiled.h";
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+
+        bUseUnity = false;
+    }
 }

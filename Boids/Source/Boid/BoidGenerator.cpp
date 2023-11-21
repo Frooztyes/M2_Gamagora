@@ -74,7 +74,7 @@ void ABoidGenerator::AddBoid() {
 }
 
 void ABoidGenerator::GenerateBoids() {
-	for (int i = 0; i < NumBoids; i++)
+	for (int i = 0; i < NumBoids - 1; i++)
 	{
 		AddBoid();
 	}
@@ -90,7 +90,7 @@ FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {
 	if (moveCloserStrength <= 0) return pc;
 
 	for (auto* b : boids)
-		if (currentBoid != b)
+		if (currentBoid->GetActorLocation() != b->GetActorLocation())
 			pc += b->GetActorLocation();
 	
 	pc /= boids.Num() - 1;
@@ -103,7 +103,7 @@ FVector ABoidGenerator::MoveWith(ABoids* currentBoid) {
 	if (moveWithStrength <= 0) return pv;
 
 	for (auto* b : boids)
-		if (currentBoid != b)
+		if (currentBoid->GetActorLocation() != b->GetActorLocation())
 			pv += b->Velocity;
 
 	pv /= boids.Num() - 1;
@@ -116,7 +116,7 @@ FVector ABoidGenerator::MoveAway(ABoids* currentBoid) {
 	FVector bjPosition = currentBoid->GetActorLocation();
 	for (auto* b : boids) {
 		FVector bPosition = b->GetActorLocation();
-		if (currentBoid != b) {
+		if (currentBoid->GetActorLocation() != b->GetActorLocation()) {
 			if (FVector::Dist(bPosition, bjPosition) < moveAwayDistance) {
 				c -= (bPosition - bjPosition);
 			}
@@ -179,6 +179,10 @@ void ABoidGenerator::LimitVelocity(ABoids * currentBoid) {
 
 void ABoidGenerator::MoveBoids() {
 	for (auto* boid : boids) {
+		if (!boid) {
+			boids.Remove(boid);
+			continue;
+		}
 		boid->Velocity += MoveWith(boid);
 		boid->Velocity += MoveCloser(boid);
 		boid->Velocity += MoveAway(boid);
@@ -195,6 +199,10 @@ void ABoidGenerator::MoveBoids() {
 
 		boid->SetActorLocation(boid->GetActorLocation() + boid->Velocity);
 	}
+}
+
+int ABoidGenerator::GetBoidsNumber() {
+	return boids.Num();
 }
 
 // Called every frame
