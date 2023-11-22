@@ -4,6 +4,7 @@
 #include "BoidGenerator.h"
 #include <format>
 #include <Components/SphereComponent.h>
+#include "ElectricalBoid.h"
 
 // Sets default values
 ABoidGenerator::ABoidGenerator()
@@ -42,12 +43,13 @@ void ABoidGenerator::BeginPlay()
 }
 
 void ABoidGenerator::Initialize(
-	UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, 
+	UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, UNiagaraSystem* nsParticle,
 	float moveCloserS, 
 	float distanceToNeigh, 
 	float catchupVelocity,
 	float attractionForce,
-	float _vLim)
+	float _vLim,
+	bool isElectrical)
 {
 	this->mat = matLoc;
 	this->NumBoids = numBoids;
@@ -58,12 +60,36 @@ void ABoidGenerator::Initialize(
 	moveAwayDistance = distanceToNeigh;
 	moveWithStrength = catchupVelocity;
 	tendToPlaceStrength = attractionForce;
+	particle = nsParticle;
 	boundToPosition = false;
 
 	vLim = _vLim;
 
-	GenerateBoids();
+	GenerateBoids(isElectrical);
 }
+
+
+void ABoidGenerator::AddElectricalBoid() {
+	FRotator SpawnRotation(90, 0, 0);
+
+	using namespace std::chrono;
+	milliseconds ms = duration_cast<milliseconds>(
+		system_clock::now().time_since_epoch()
+	);
+	FMath::SRandInit(ms.count());
+	FMath::RandInit(ms.count() + boids.Num() * ms.count());
+
+	FVector SpawnLocation(
+		FMath::RandRange(-radiusBorder, radiusBorder),
+		FMath::RandRange(-radiusBorder, radiusBorder),
+		FMath::RandRange(-radiusBorder, radiusBorder)
+	);
+
+	AElectricalBoid* boid = GetWorld()->SpawnActor<AElectricalBoid>(GetActorLocation() + SpawnLocation, SpawnRotation);
+	boid->Initialize(mat, boidMesh, particle, true, false, this);
+	boids.Add(boid);
+}
+
 
 void ABoidGenerator::AddBoid() {
 	FRotator SpawnRotation(90, 0, 0);
@@ -82,24 +108,24 @@ void ABoidGenerator::AddBoid() {
 	);
 
 	ABoids* boid = GetWorld()->SpawnActor<ABoids>(GetActorLocation() + SpawnLocation, SpawnRotation);
-	boid->Initialize(mat, boidMesh, true, false);
-	//boid->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	//boid->SetActorLocation(GetActorLocation() + SpawnLocation);
-
+	boid->Initialize(mat, boidMesh, true, false, this);
 	boids.Add(boid);
 }
 
-void ABoidGenerator::GenerateBoids() {
+void ABoidGenerator::GenerateBoids(bool isElectrical) {
 	for (int i = 0; i < NumBoids - 1; i++)
 	{
-		AddBoid();
+		if (isElectrical)
+			AddElectricalBoid();
+		else
+			AddBoid();
 	}
 }
 
 void ABoidGenerator::Launch(FVector position) {
 	this->launchPosition = position;
 	this->isLaunched = true;
-	vLim = vLim * 3;
+	vLim = vLim * 3;;
 }
 
 FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {

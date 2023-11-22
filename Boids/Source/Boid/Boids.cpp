@@ -29,21 +29,21 @@ ABoids::ABoids()
 	}
 
 	Velocity = FVector(0, 0, 0);
-	/*Collider = NewObject<UBoxComponent>(this, FName("BoxCollider"));
+	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollider"));
 	Collider->SetBoxExtent(VisualMesh->Bounds.BoxExtent);
 	Collider->bDynamicObstacle = true;
 	Collider->AttachToComponent(VisualMesh, FAttachmentTransformRules::KeepRelativeTransform);
 	Collider->SetWorldLocation(GetActorLocation() + FVector(0, 0, VisualMesh->Bounds.BoxExtent.Z));
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ABoids::OnOverlapBegin);
-	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);*/
+	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);
 }
 
-void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle) {
+void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle, ABoidGenerator* boidGenerator) {
 	VisualMesh->SetMaterial(0, mat);
 	VisualMesh->SetStaticMesh(mesh);
 	this->faceCamera = faceCam;
 	this->debugVisible = debugCircle;
-
+	this->generator = boidGenerator;
 }
 
 
@@ -60,10 +60,10 @@ void ABoids::BeginPlay()
 	Velocity.Y = FMath::SRand();
 	Velocity.Z = FMath::SRand();
 
-	FVector origin;
-	FVector boxExtent;
-	GetActorBounds(false, origin, boxExtent);
-	Collider->SetBoxExtent(boxExtent);
+	//FVector origin;
+	//FVector boxExtent;
+	//GetActorBounds(false, origin, boxExtent);
+	//Collider->SetBoxExtent(boxExtent);
 }
 
 void ABoids::RotateToCamera() {

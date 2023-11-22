@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Boids.generated.h"
 
+class ABoidGenerator;
+
 UCLASS()
 class BOID_API ABoids : public AActor
 {
@@ -14,11 +16,11 @@ class BOID_API ABoids : public AActor
 private:
 	float maxVelocity = 20;
 	bool faceCamera = false;
+	ABoidGenerator* generator;
 
 public:
-	// Sets default values for this actor's properties
 	ABoids();
-	void Initialize(UMaterial *mat, UStaticMesh*mesh, bool faceCam, bool debugCircle);
+	void Initialize(UMaterial *mat, UStaticMesh*mesh, bool faceCam, bool debugCircle, ABoidGenerator * boidGenerator);
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* VisualMesh;

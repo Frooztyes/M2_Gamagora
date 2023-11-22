@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class Boid : ModuleRules
@@ -10,7 +11,8 @@ public class Boid : ModuleRules
 
         PrivatePCHHeaderFile = "BoidsPrecompiled.h";
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara" });
+
 
         MinFilesUsingPrecompiledHeaderOverride = 1;
 
