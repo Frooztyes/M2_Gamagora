@@ -39,7 +39,9 @@ ABoids::ABoids()
 }
 
 void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle, ABoidGenerator* boidGenerator) {
-	VisualMesh->SetMaterial(0, mat);
+	UMaterial* mat2(mat);
+
+	VisualMesh->SetMaterial(0, mat2);
 	VisualMesh->SetStaticMesh(mesh);
 	this->faceCamera = faceCam;
 	this->debugVisible = debugCircle;
@@ -84,7 +86,7 @@ void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep, 
 	const FHitResult& SweepResult) 
 {
-	if (Cast<ABP_GroundClass>(OtherActor)) {
+	if (OtherActor->ActorHasTag("Ground")) {
 		Destroy();
 	}
 }

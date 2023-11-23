@@ -42,14 +42,13 @@ void ABoidGenerator::BeginPlay()
 	player = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
-void ABoidGenerator::Initialize(
+TArray<ABoids *> ABoidGenerator::Initialize(
 	UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, UNiagaraSystem* nsParticle,
 	float moveCloserS, 
 	float distanceToNeigh, 
 	float catchupVelocity,
 	float attractionForce,
-	float _vLim,
-	bool isElectrical)
+	float _vLim)
 {
 	this->mat = matLoc;
 	this->NumBoids = numBoids;
@@ -65,31 +64,9 @@ void ABoidGenerator::Initialize(
 
 	vLim = _vLim;
 
-	GenerateBoids(isElectrical);
+	GenerateBoids();
+	return boids;
 }
-
-
-void ABoidGenerator::AddElectricalBoid() {
-	FRotator SpawnRotation(90, 0, 0);
-
-	using namespace std::chrono;
-	milliseconds ms = duration_cast<milliseconds>(
-		system_clock::now().time_since_epoch()
-	);
-	FMath::SRandInit(ms.count());
-	FMath::RandInit(ms.count() + boids.Num() * ms.count());
-
-	FVector SpawnLocation(
-		FMath::RandRange(-radiusBorder, radiusBorder),
-		FMath::RandRange(-radiusBorder, radiusBorder),
-		FMath::RandRange(-radiusBorder, radiusBorder)
-	);
-
-	AElectricalBoid* boid = GetWorld()->SpawnActor<AElectricalBoid>(GetActorLocation() + SpawnLocation, SpawnRotation);
-	boid->Initialize(mat, boidMesh, particle, true, false, this);
-	boids.Add(boid);
-}
-
 
 void ABoidGenerator::AddBoid() {
 	FRotator SpawnRotation(90, 0, 0);
@@ -112,20 +89,17 @@ void ABoidGenerator::AddBoid() {
 	boids.Add(boid);
 }
 
-void ABoidGenerator::GenerateBoids(bool isElectrical) {
+void ABoidGenerator::GenerateBoids() {
 	for (int i = 0; i < NumBoids - 1; i++)
 	{
-		if (isElectrical)
-			AddElectricalBoid();
-		else
-			AddBoid();
+		AddBoid();
 	}
 }
 
 void ABoidGenerator::Launch(FVector position) {
 	this->launchPosition = position;
 	this->isLaunched = true;
-	vLim = vLim * 3;;
+	vLim = vLim * 3;
 }
 
 FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {

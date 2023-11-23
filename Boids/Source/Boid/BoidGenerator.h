@@ -27,22 +27,18 @@ public:
 	UNiagaraSystem* particle;
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, UNiagaraSystem * nsParticle, 
+	TArray<ABoids*> Initialize(UMaterial* matLoc, int numBoids, UStaticMesh* staticMesh, FVector offsetPlayer, UNiagaraSystem * nsParticle,
 		float moveCloserS = 1000,
 		float distanceToNeigh = 0.35f, 
 		float catchupVelocity = 10,
 		float attractionForce = 10, 
-		float _vLim = 50, 
-		bool isElectrical = false);
+		float _vLim = 50);
 
 	UFUNCTION(BlueprintCallable)
 	void Launch(FVector position);
 
 	UFUNCTION(BlueprintCallable)
 	void AddBoid();
-
-	UFUNCTION(BlueprintCallable)
-	void AddElectricalBoid();
 
 	UFUNCTION(BlueprintCallable)
 	int GetBoidsNumber();
@@ -93,7 +89,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void GenerateBoids(bool isElectrical);
+	void GenerateBoids();
 	bool IsInSphere(FVector center, FVector point, float radius);
 	FVector MoveCloser(ABoids* currentBoid);
 	FVector MoveWith(ABoids* currentBoid);

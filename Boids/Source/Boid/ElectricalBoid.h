@@ -21,7 +21,6 @@ protected:
 
 public:
 	virtual void BeginPlay() override;
-	AElectricalBoid();
 
 	void Initialize(UMaterial* mat, UStaticMesh* mesh, UNiagaraSystem * nsParticle, bool faceCam, bool debugCircle, ABoidGenerator* boidGenerator);
 
