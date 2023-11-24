@@ -68,7 +68,7 @@ TArray<ABoids *> ABoidGenerator::Initialize(
 	return boids;
 }
 
-void ABoidGenerator::AddBoid() {
+ABoids * ABoidGenerator::AddBoid() {
 	FRotator SpawnRotation(90, 0, 0);
 
 	using namespace std::chrono;
@@ -87,6 +87,7 @@ void ABoidGenerator::AddBoid() {
 	ABoids* boid = GetWorld()->SpawnActor<ABoids>(GetActorLocation() + SpawnLocation, SpawnRotation);
 	boid->Initialize(mat, boidMesh, true, false, this);
 	boids.Add(boid);
+	return boid;
 }
 
 void ABoidGenerator::GenerateBoids() {

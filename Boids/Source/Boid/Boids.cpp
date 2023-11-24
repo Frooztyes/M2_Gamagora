@@ -89,6 +89,10 @@ void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 	if (OtherActor->ActorHasTag("Ground")) {
 		Destroy();
 	}
+
+	if (OtherActor->ActorHasTag("Target")) {
+		//Destroy();
+	}
 }
 
 void ABoids::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, 

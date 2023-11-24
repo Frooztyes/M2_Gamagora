@@ -38,7 +38,7 @@ public:
 	void Launch(FVector position);
 
 	UFUNCTION(BlueprintCallable)
-	void AddBoid();
+	ABoids * AddBoid();
 
 	UFUNCTION(BlueprintCallable)
 	int GetBoidsNumber();
