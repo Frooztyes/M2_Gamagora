@@ -48,7 +48,8 @@ TArray<ABoids *> ABoidGenerator::Initialize(
 	float distanceToNeigh, 
 	float catchupVelocity,
 	float attractionForce,
-	float _vLim)
+	float _vLim,
+	bool explosif)
 {
 	this->mat = matLoc;
 	this->NumBoids = numBoids;
@@ -64,11 +65,11 @@ TArray<ABoids *> ABoidGenerator::Initialize(
 
 	vLim = _vLim;
 
-	GenerateBoids();
+	GenerateBoids(explosif);
 	return boids;
 }
 
-ABoids * ABoidGenerator::AddBoid() {
+ABoids * ABoidGenerator::AddBoid(bool explosif) {
 	FRotator SpawnRotation(90, 0, 0);
 
 	using namespace std::chrono;
@@ -85,15 +86,15 @@ ABoids * ABoidGenerator::AddBoid() {
 	);
 
 	ABoids* boid = GetWorld()->SpawnActor<ABoids>(GetActorLocation() + SpawnLocation, SpawnRotation);
-	boid->Initialize(mat, boidMesh, true, false, this);
+	boid->Initialize(mat, boidMesh, true, false, explosif, this);
 	boids.Add(boid);
 	return boid;
 }
 
-void ABoidGenerator::GenerateBoids() {
+void ABoidGenerator::GenerateBoids(bool explosif) {
 	for (int i = 0; i < NumBoids - 1; i++)
 	{
-		AddBoid();
+		AddBoid(explosif);
 	}
 }
 
@@ -101,6 +102,14 @@ void ABoidGenerator::Launch(FVector position) {
 	this->launchPosition = position;
 	this->isLaunched = true;
 	vLim = vLim * 3;
+}
+
+void ABoidGenerator::DestroyGenerator()
+{
+	for (auto* b : boids) {
+		b->Destroy();
+	}
+	Destroy();
 }
 
 FVector ABoidGenerator::MoveCloser(ABoids* currentBoid) {
@@ -195,9 +204,10 @@ void ABoidGenerator::LimitVelocity(ABoids * currentBoid) {
 }
 
 void ABoidGenerator::MoveBoids(float DeltaTime) {
+	int elem = 0;
 	for (auto* boid : boids) {
-		if (!boid) {
-			boids.Remove(boid);
+		if (!IsValid(boid->VisualMesh)) {
+			elem++;
 			continue;
 		}
 
@@ -220,6 +230,7 @@ void ABoidGenerator::MoveBoids(float DeltaTime) {
 
 		boid->SetActorLocation(boid->GetActorLocation() + boid->Velocity * DeltaTime * 30);
 	}
+	if (elem == boids.Num()) Destroy();
 }
 
 int ABoidGenerator::GetBoidsNumber() {
@@ -234,6 +245,7 @@ void ABoidGenerator::Tick(float DeltaTime)
 	if (isLaunched) {
 		//SetActorLocation(FMath::Lerp(GetActorLocation(), launchPosition, DeltaTime));
 		SetActorLocation(launchPosition);
+		if (boids.Num() == 0) Destroy();
 	}
 	else {
 		SetActorLocation(player->GetActorLocation() + offset);

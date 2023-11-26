@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#ifndef A_BOID_H
+#define A_BOID_H
 #include "Boids.h"
+#endif
 #include "BoidGenerator.generated.h"
 
 UCLASS()
@@ -32,13 +35,17 @@ public:
 		float distanceToNeigh = 0.35f, 
 		float catchupVelocity = 10,
 		float attractionForce = 10, 
-		float _vLim = 50);
+		float _vLim = 50,
+		bool explosif = true);
 
 	UFUNCTION(BlueprintCallable)
 	void Launch(FVector position);
 
 	UFUNCTION(BlueprintCallable)
-	ABoids * AddBoid();
+	void DestroyGenerator();
+
+	UFUNCTION(BlueprintCallable)
+	ABoids * AddBoid(bool explosif);
 
 	UFUNCTION(BlueprintCallable)
 	int GetBoidsNumber();
@@ -89,7 +96,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void GenerateBoids();
+	void GenerateBoids(bool explosif);
 	bool IsInSphere(FVector center, FVector point, float radius);
 	FVector MoveCloser(ABoids* currentBoid);
 	FVector MoveWith(ABoids* currentBoid);

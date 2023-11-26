@@ -38,7 +38,7 @@ ABoids::ABoids()
 	Collider->OnComponentEndOverlap.AddDynamic(this, &ABoids::OnOverlapEnd);
 }
 
-void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle, ABoidGenerator* boidGenerator) {
+void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool debugCircle, bool estExplosif, ABoidGenerator* boidGenerator) {
 	UMaterial* mat2(mat);
 
 	VisualMesh->SetMaterial(0, mat2);
@@ -46,6 +46,7 @@ void ABoids::Initialize(UMaterial *mat, UStaticMesh* mesh, bool faceCam, bool de
 	this->faceCamera = faceCam;
 	this->debugVisible = debugCircle;
 	this->generator = boidGenerator;
+	this->explosif = estExplosif;
 }
 
 
@@ -79,6 +80,15 @@ void ABoids::RotateToCamera() {
 	SetActorRotation(rotToCam);
 }
 
+void ABoids::DestroyOwner() {
+	generator->DestroyGenerator();
+}
+
+bool ABoids::IsExplosif() {
+	return this->explosif;
+}
+
+
 void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
 	class AActor* OtherActor, 
 	class UPrimitiveComponent* OtherComp, 
@@ -86,12 +96,8 @@ void ABoids::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep, 
 	const FHitResult& SweepResult) 
 {
-	if (OtherActor->ActorHasTag("Ground")) {
+	if (OtherActor->ActorHasTag("Ground") && generator != nullptr) {
 		Destroy();
-	}
-
-	if (OtherActor->ActorHasTag("Target")) {
-		//Destroy();
 	}
 }
 
@@ -103,6 +109,10 @@ void ABoids::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp,
 
 }
 
+int ABoids::GetBoidsNum() {
+	return generator->boids.Num();
+}
+
 // Called every frame
 void ABoids::Tick(float DeltaTime)
 {
@@ -110,6 +120,6 @@ void ABoids::Tick(float DeltaTime)
 
 	if (faceCamera)
 		RotateToCamera();
-
+	if (FVector::Dist(GetActorLocation(), FVector(0, 0, 0)) > 4000) generator->DestroyGenerator();
 }
 
