@@ -5,9 +5,6 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
-				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/MyContent/Chara/BP_MyThirdPersonCharacter.uasset",
-				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/5/DL/WH0COEACLJCUKS5EUV8MJJ.uasset",
-				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/MyContent/Skateboard/Skateboard.uasset",
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/StarterContent/HDRI/HDRI_Epic_Courtyard_Daylight.uasset",
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/MyContent/Chara/BP_MyThirdPersonCharacter.uasset",
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/3/FO/VCVPRQ71WV9NEUGEWT01CT.uasset",
@@ -32,7 +29,26 @@
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/A/HA/3B1N7Y70S8D3815L2VA5PN.uasset",
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/4/X3/PWWGSTL7SN2I1YQ5TW3D5M.uasset",
 				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/C/9A/4AOJU9RF1S25JOX97R3HIS.uasset",
-				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/D/1H/O2JOF69YNAURDMFFDVOGSA.uasset"
+				"C:/Users/ymiollany/Desktop/Mes cours/Protos/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/D/1H/O2JOF69YNAURDMFFDVOGSA.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Chara/BP_MyThirdPersonCharacter.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_rig_Skeleton.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/5/DL/WH0COEACLJCUKS5EUV8MJJ.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/lambert1.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_DefaultMaterial_AlbedoTransparency.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_DefaultMaterial_AO.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_DefaultMaterial_Height.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_DefaultMaterial_MetallicSmoothness.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_DefaultMaterial_Normal.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_rig.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_rig_Anim.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/skate_rig_PhysicsAsset.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/Skate.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/MySkate.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/MyContent/Skate2/BP_ThirdPersonCharacter.uasset",
+				"C:/Users/ymiollany/Desktop/Git/M2_Gamagora/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/1/W2/18VE7L0MPNTJVKGA9XZG29.uasset",
+				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/MyContent/Chara/BP_MyThirdPersonCharacter.uasset",
+				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/5/DL/WH0COEACLJCUKS5EUV8MJJ.uasset",
+				"C:/Programmation/Lyon2/M2_Gamagora/ProtoOLG/Content/MyContent/Skateboard/Skateboard.uasset"
 			]
 		}
 	]
