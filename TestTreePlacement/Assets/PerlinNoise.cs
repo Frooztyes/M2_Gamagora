@@ -7,12 +7,14 @@ public class PerlinNoise : MonoBehaviour
 {
     [Range(5, 20)]
     [SerializeField] private int bounds;
-    [Range(0.2f, 5)]
+    [Range(50, 200)]
     [SerializeField] private float _minDist;
     [Range(1, 2000)]
     [SerializeField] private int seed = 10;
     [Range(1, 20)]
-    [SerializeField] private int newPoints = 1;
+    [SerializeField] private int newPoints;
+    [SerializeField] private RectTransform myRect;
+    [SerializeField] private RawImage myImage;
 
     struct RandomQueue
     {
@@ -60,13 +62,13 @@ public class PerlinNoise : MonoBehaviour
     List<Vector2> generatePoisson(int width, int height, float minDist, int newPointsCount)
     {
         float cellSize = minDist / Mathf.Sqrt(2);
-        Vector2?[,] grid = new Vector2?[(int)Mathf.Ceil(width / cellSize), (int)Mathf.Ceil(height / cellSize)];
 
-        for (int i = 0; i < grid.GetLength(0); i++)
+        Dictionary<Vector2Int, Vector2?> grid = new Dictionary<Vector2Int, Vector2?>();
+        for (int i = 0; i < Mathf.Ceil(width / cellSize); i++)
         {
-            for (int j = 0; j < grid.GetLength(1); j++)
+            for (int j = 0; j < Mathf.Ceil(height / cellSize); j++)
             {
-                grid[i, j] = null;
+                grid.Add(new Vector2Int(i, j), null);
             }
         }
 
@@ -77,7 +79,7 @@ public class PerlinNoise : MonoBehaviour
 
         processList.push(firstPoint);
         samplePoints.Add(firstPoint);
-        grid[imageToGrid(firstPoint, cellSize).x, imageToGrid(firstPoint, cellSize).y] = firstPoint;
+        grid[imageToGrid(firstPoint, cellSize)] = firstPoint;
         while(!processList.empty())
         {
             Vector2 point = processList.pop();
@@ -90,8 +92,7 @@ public class PerlinNoise : MonoBehaviour
                 {
                     processList.push(newPoint);
                     samplePoints.Add(newPoint);
-                    Vector2Int pointOnGrid = imageToGrid(newPoint, cellSize);
-                    grid[pointOnGrid.x, pointOnGrid.y] = newPoint;
+                    grid[imageToGrid(newPoint, cellSize)] = newPoint;
                 }
             }
         }
@@ -117,11 +118,11 @@ public class PerlinNoise : MonoBehaviour
         return new Vector2(newX, newY);
     }
 
-    bool inNeighbourhood(Vector2?[,] grid, Vector2 point, float minDist, float cellSize)
+    bool inNeighbourhood(Dictionary<Vector2Int, Vector2?> grid, Vector2 point, float minDist, float cellSize)
     {
         Vector2 gridPoint = imageToGrid(point, cellSize);
 
-        List<Vector2?> cellsAroundPoint = squareAroundPoint(grid, gridPoint, 1);
+        List<Vector2?> cellsAroundPoint = squareAroundPoint(grid, gridPoint, 5);
         foreach (Vector2? cell in cellsAroundPoint)
         {
             if(cell is Vector2 cellV)
@@ -135,46 +136,23 @@ public class PerlinNoise : MonoBehaviour
         return false;
     }
 
-    List<Vector2?> squareAroundPoint(Vector2?[,] grid, Vector2 gridPoint, float radius)
+    List<Vector2?> squareAroundPoint(Dictionary<Vector2Int, Vector2?> grid, Vector2 gridPoint, float radius)
     {
         List<Vector2?> pts = new List<Vector2?>();
-        //for (int i = 0; i < grid.GetLength(0); i++)
-        //{
-        //    for (int j = 0; j < grid.GetLength(1); j++)
-        //    {
-        //        if(Vector2.Distance(grid[i,j], gridPoint) < radius)
-        //        {
-        //            pts.Add(grid[i, j]);
-        //        }
-        //    }
-        //}
-        //return pts;
-        float minIndexX = gridPoint.x - 5;
-        minIndexX = minIndexX <= 0 ? 0 : minIndexX;
 
-        float maxIndexX = gridPoint.x + 5;
-        maxIndexX = maxIndexX > grid.GetLength(0) ? grid.GetLength(0) - 1 : maxIndexX;
+        int minIndexX = (int)(gridPoint.x - radius);
+        int maxIndexX = (int)(gridPoint.x + radius);
+        int minIndexY = (int)(gridPoint.y - radius);
+        int maxIndexY = (int)(gridPoint.y + radius);
 
-
-        float minIndexY = gridPoint.y - 5;
-        minIndexY = minIndexY <= 0 ? 0 : minIndexY;
-
-        float maxIndexY = gridPoint.y + 5;
-        maxIndexY = maxIndexY > grid.GetLength(1) ? grid.GetLength(1) - 1 : maxIndexY;
-
-        for (float i = minIndexX; i < maxIndexX; i++)
-        {
-            for (float j = minIndexY; j < maxIndexY; j++)
-            {
-                Vector2? value = grid[(int)i, (int) j];
-                pts.Add(value);
-            }
-        }
+        for (int i = minIndexX; i < maxIndexX; i++)
+            for (int j = minIndexY; j < maxIndexY; j++)
+                if(grid.TryGetValue(new Vector2Int(i, j), out Vector2? value))
+                    pts.Add(value);
 
         return pts;
     }
 
-    RawImage myImage;
 
     public Texture2D DrawCircle(Texture2D tex, Color color, int x, int y, int radius = 3)
     {
@@ -191,15 +169,35 @@ public class PerlinNoise : MonoBehaviour
         return tex;
     }
 
+    public void DrawLine(Texture2D tex, Vector2 p1, Vector2 p2, Color col)
+    {
+        Vector2 t = p1;
+        float frac = 1 / Mathf.Sqrt(Mathf.Pow(p2.x - p1.x, 2) + Mathf.Pow(p2.y - p1.y, 2));
+        float ctr = 0;
+
+        while ((int)t.x != (int)p2.x || (int)t.y != (int)p2.y)
+        {
+            t = Vector2.Lerp(p1, p2, ctr);
+            ctr += frac;
+            tex.SetPixel((int)t.x, (int)t.y, col);
+        }
+    }
+
+    Texture2D tex;
     private void Start()
     {
-        myImage = GetComponent<RawImage>();
+        tex = new Texture2D((int)myRect.rect.width, (int)myRect.rect.height);
+        myImage.texture = tex;   
+    }
 
+    private void Update()
+    {
+        Random.InitState(seed);
         List<Vector2> myPts = generatePoisson(
-            (int)myImage.rectTransform.rect.width, 
-            (int)myImage.rectTransform.rect.height, _minDist, newPoints);
+            (int)myRect.rect.width, 
+            (int)myRect.rect.height, _minDist, newPoints);
 
-        Texture2D tex = new((int)myImage.rectTransform.rect.width, (int) myImage.rectTransform.rect.height);
+        
         var colorData = tex.GetPixels32();
         for (int i = 0; i < colorData.Length; i++)
         {
@@ -209,18 +207,34 @@ public class PerlinNoise : MonoBehaviour
 
         foreach (Vector2 pt in myPts)
         {
-            DrawCircle(tex, Color.red, (int) pt.x, (int) pt.y, 30);
+            DrawCircle(tex, Color.red, (int)pt.x, (int)pt.y, 30);
         }
 
-        
+        float cellSize = _minDist / Mathf.Sqrt(2);
+        float width = myRect.rect.width;
+        float height = myRect.rect.height;
+
+        for (float x = 0; x < (float)myRect.rect.width; x += cellSize)
+        {
+            DrawLine(tex,
+                new Vector2(x, 0),
+                new Vector2(x, height),
+                Color.blue
+                );
+            DrawLine(tex,
+                new Vector2(0, x),
+                new Vector2(width, x),
+                Color.blue
+                );
+        }
 
         tex.Apply();
-        myImage.texture = tex;
     }
 
 
     private void OnDrawGizmosSelected()
     {
+        return;
         bounds = 1000;
         _minDist = 100;
         newPoints = 1;
