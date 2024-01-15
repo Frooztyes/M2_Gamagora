@@ -7,14 +7,22 @@ public class PerlinNoise : MonoBehaviour
 {
     [Range(5, 20)]
     [SerializeField] private int bounds;
-    [Range(50, 200)]
+    [Range(10, 200)]
     [SerializeField] private float _minDist;
     [Range(1, 2000)]
     [SerializeField] private int seed = 10;
     [Range(1, 20)]
     [SerializeField] private int newPoints;
+    [Range(0.5f, 50)]
+    [SerializeField] private float minNoise = 1f;
+    [Range(0.5f, 50)]
+    [SerializeField] private float maxNoise = 2f;
+    [Range(0.1f, 6f)]
+    [SerializeField] private float perlinScale = 1f;
     [SerializeField] private RectTransform myRect;
     [SerializeField] private RawImage myImage;
+
+    private float perlinOffset = 0;
 
     struct RandomQueue
     {
@@ -59,6 +67,27 @@ public class PerlinNoise : MonoBehaviour
         return new Vector2Int(gridX, gridY);
     }
 
+    Dictionary<Vector2Int, float> Grey(Vector2 size, float minDist)
+    {
+        Dictionary<Vector2Int, float> grey = new Dictionary<Vector2Int, float>();
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                float xCoord = (x / size.x) * perlinScale;
+                float yCoord = (y / size.y) * perlinScale; 
+
+                float noise = Mathf.PerlinNoise(perlinOffset + xCoord, perlinOffset + yCoord);
+                noise *= (maxNoise - minNoise);
+                noise += minNoise;
+
+                grey.Add(new Vector2Int(x, y), noise * minDist);
+            }
+        }
+        return grey;
+    }
+
+
     List<Vector2> generatePoisson(int width, int height, float minDist, int newPointsCount)
     {
         float cellSize = minDist / Mathf.Sqrt(2);
@@ -72,6 +101,9 @@ public class PerlinNoise : MonoBehaviour
             }
         }
 
+        Dictionary<Vector2Int, float> grey 
+            = Grey(new Vector2(Mathf.Ceil(width / cellSize), Mathf.Ceil(height / cellSize)), minDist);
+
         RandomQueue processList = new RandomQueue(0);
         List<Vector2> samplePoints = new List<Vector2>();
 
@@ -83,7 +115,8 @@ public class PerlinNoise : MonoBehaviour
         while(!processList.empty())
         {
             Vector2 point = processList.pop();
-
+            Vector2 gridPoint = imageToGrid(point, cellSize);
+            minDist = grey[Vector2Int.FloorToInt(gridPoint)];
             for (int i = 0; i < newPointsCount; i++)
             {
                 Vector2 newPoint = generateRandomPointAround(point, minDist);
@@ -187,12 +220,16 @@ public class PerlinNoise : MonoBehaviour
     private void Start()
     {
         tex = new Texture2D((int)myRect.rect.width, (int)myRect.rect.height);
-        myImage.texture = tex;   
+        myImage.texture = tex;
+        GeneratePoints();
     }
 
-    private void Update()
+    private void GeneratePoints()
     {
         Random.InitState(seed);
+
+        perlinOffset = Random.Range(0, 100000);
+
         List<Vector2> myPts = generatePoisson(
             (int)myRect.rect.width, 
             (int)myRect.rect.height, _minDist, newPoints);
@@ -207,64 +244,64 @@ public class PerlinNoise : MonoBehaviour
 
         foreach (Vector2 pt in myPts)
         {
-            DrawCircle(tex, Color.red, (int)pt.x, (int)pt.y, 30);
+            DrawCircle(tex, Color.red, (int)pt.x, (int)pt.y, 4);
         }
 
-        float cellSize = _minDist / Mathf.Sqrt(2);
-        float width = myRect.rect.width;
-        float height = myRect.rect.height;
+        //float cellSize = _minDist / Mathf.Sqrt(2);
+        //float width = myRect.rect.width;
+        //float height = myRect.rect.height;
 
-        for (float x = 0; x < (float)myRect.rect.width; x += cellSize)
-        {
-            DrawLine(tex,
-                new Vector2(x, 0),
-                new Vector2(x, height),
-                Color.blue
-                );
-            DrawLine(tex,
-                new Vector2(0, x),
-                new Vector2(width, x),
-                Color.blue
-                );
-        }
+        //for (float x = 0; x < (float)myRect.rect.width; x += cellSize)
+        //{
+        //    DrawLine(tex,
+        //        new Vector2(x, 0),
+        //        new Vector2(x, height),
+        //        Color.blue
+        //        );
+        //    DrawLine(tex,
+        //        new Vector2(0, x),
+        //        new Vector2(width, x),
+        //        Color.blue
+        //        );
+        //}
 
         tex.Apply();
     }
 
 
-    private void OnDrawGizmosSelected()
-    {
-        return;
-        bounds = 1000;
-        _minDist = 100;
-        newPoints = 1;
-        Random.InitState(seed);
-        List<Vector2> myPts = generatePoisson(bounds, bounds, _minDist, newPoints);
-        Gizmos.color = Color.red;
+    //private void OnDrawGizmosSelected()
+    //{
+    //    return;
+    //    bounds = 1000;
+    //    _minDist = 100;
+    //    newPoints = 1;
+    //    Random.InitState(seed);
+    //    List<Vector2> myPts = generatePoisson(bounds, bounds, _minDist, newPoints);
+    //    Gizmos.color = Color.red;
 
-        Gizmos.DrawLine(
-            new Vector3(0, 0, bounds),
-            new Vector3(bounds, 0, bounds)
-        );
+    //    Gizmos.DrawLine(
+    //        new Vector3(0, 0, bounds),
+    //        new Vector3(bounds, 0, bounds)
+    //    );
 
-        Gizmos.DrawLine(
-            new Vector3(bounds, 0, 0),
-            new Vector3(bounds, 0, bounds)
-        );
+    //    Gizmos.DrawLine(
+    //        new Vector3(bounds, 0, 0),
+    //        new Vector3(bounds, 0, bounds)
+    //    );
 
-        Gizmos.DrawLine(
-            new Vector3(0, 0, 0),
-            new Vector3(0, 0, bounds)
-        );
+    //    Gizmos.DrawLine(
+    //        new Vector3(0, 0, 0),
+    //        new Vector3(0, 0, bounds)
+    //    );
 
-        Gizmos.DrawLine(
-            new Vector3(0, 0, 0),
-            new Vector3(bounds, 0, 0)
-        );
+    //    Gizmos.DrawLine(
+    //        new Vector3(0, 0, 0),
+    //        new Vector3(bounds, 0, 0)
+    //    );
 
-        foreach (Vector2 pt in myPts)
-        {
-            Gizmos.DrawSphere(new Vector3(pt.x, pt.y, 0), 5f);
-        }
-    }
+    //    foreach (Vector2 pt in myPts)
+    //    {
+    //        Gizmos.DrawSphere(new Vector3(pt.x, pt.y, 0), 5f);
+    //    }
+    //}
 }
